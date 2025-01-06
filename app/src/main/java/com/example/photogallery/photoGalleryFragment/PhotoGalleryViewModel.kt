@@ -2,8 +2,8 @@ package com.example.photogallery.photoGalleryFragment
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.photogallery.FlickrFetcher
-import com.example.photogallery.GalleryItem
+import com.example.photogallery.data.FlickrFetcher
+import com.example.photogallery.data.GalleryItem
 
 class PhotoGalleryViewModel: ViewModel() {
 

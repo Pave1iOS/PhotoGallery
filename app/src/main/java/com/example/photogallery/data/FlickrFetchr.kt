@@ -1,17 +1,15 @@
-package com.example.photogallery
+package com.example.photogallery.data
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.FlickrResponse
-import com.example.photogallery.api.PhotoResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class FlickrFetcher {
 

@@ -3,7 +3,7 @@ package com.example.photogallery.photoGalleryFragment
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.photogallery.GalleryItem
+import com.example.photogallery.data.GalleryItem
 
 class PhotoGalleryAdapter(
     private val galleryItems: List<GalleryItem>
