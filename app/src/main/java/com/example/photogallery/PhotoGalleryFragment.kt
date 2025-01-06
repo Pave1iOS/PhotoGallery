@@ -29,12 +29,10 @@ class PhotoGalleryFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val flickrLD = FlickrFetcher().fetchContents()
+        val flickrLD = FlickrFetcher().fetchPhotos()
         flickrLD.observe(this) {
             Log.d(TAG, "response received $it")
         }
-
-
 
     }
 
