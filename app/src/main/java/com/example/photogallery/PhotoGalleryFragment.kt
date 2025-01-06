@@ -6,12 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class PhotoGalleryFragment: Fragment() {
 
     private lateinit var photoRecyclerView: RecyclerView
+
+    private val viewModel by lazy {
+        ViewModelProvider(this)[PhotoGalleryViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,12 +31,11 @@ class PhotoGalleryFragment: Fragment() {
         return view
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val flickrLD = FlickrFetcher().fetchPhotos()
-        flickrLD.observe(this) {
-            Log.d(TAG, "response received $it")
+        viewModel.galleryItemLD.observe(viewLifecycleOwner) {
+            Log.d(TAG, "Have gallery items from ViewModel $it")
         }
 
     }
