@@ -36,8 +36,11 @@ android {
 }
 
 dependencies {
-    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+
+    implementation(libs.gson)
+    implementation(libs.converter.scalars)
     implementation(libs.retrofit)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
