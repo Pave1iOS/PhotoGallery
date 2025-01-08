@@ -8,21 +8,8 @@ import com.example.photogallery.api.FlickrResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class FlickrFetcher {
-
-    private val flickrApi: FlickrApi
-
-    init {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.flickr.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        flickrApi = retrofit.create(FlickrApi::class.java)
-    }
+class FlickrFetcher(private var flickrApi: FlickrApi) {
 
     fun fetchPhotos(): LiveData<List<GalleryItem>> {
         val responseLD = MutableLiveData<List<GalleryItem>>()
