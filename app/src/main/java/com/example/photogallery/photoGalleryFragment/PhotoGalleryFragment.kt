@@ -1,7 +1,6 @@
 package com.example.photogallery.photoGalleryFragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,15 +8,23 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.photogallery.App
 import com.example.photogallery.R
+import com.example.photogallery.data.FlickrFetcher
+import javax.inject.Inject
 
 class PhotoGalleryFragment: Fragment() {
 
+    @Inject lateinit var flickrFetcher: FlickrFetcher
+    @Inject lateinit var viewModel: PhotoGalleryViewModel
+
+//    private val viewModel by lazy {
+//        ViewModelProvider(this)[PhotoGalleryViewModel(flickrFetcher)::class.java]
+//    }
+
+
     private lateinit var photoRecyclerView: RecyclerView
 
-    private val viewModel by lazy {
-        ViewModelProvider(this)[PhotoGalleryViewModel::class.java]
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,13 +39,21 @@ class PhotoGalleryFragment: Fragment() {
         return view
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        (requireActivity().application as App).appComponent.injectPhotoFragment(this)
+
+//        viewModel = ViewModelProvider(this)[PhotoGalleryViewModel::class.java]
+        viewModel = PhotoGalleryViewModel(flickrFetcher)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.galleryItemLD.observe(viewLifecycleOwner) {
             photoRecyclerView.adapter = PhotoGalleryAdapter(it)
         }
-
     }
 
     companion object {

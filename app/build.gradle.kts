@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    kotlin("kapt")
 }
 
 android {
@@ -36,6 +37,10 @@ android {
 }
 
 dependencies {
+
+    kapt(libs.dagger.compiler)
+    implementation(libs.dagger)
+    annotationProcessor(libs.dagger.compiler)
 
     implementation(libs.converter.gson)
     implementation(libs.gson)

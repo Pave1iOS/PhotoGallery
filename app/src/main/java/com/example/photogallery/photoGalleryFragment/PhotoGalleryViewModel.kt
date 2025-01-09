@@ -1,27 +1,27 @@
 package com.example.photogallery.photoGalleryFragment
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.data.FlickrFetcher
 import com.example.photogallery.data.GalleryItem
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
 
-class PhotoGalleryViewModel: ViewModel() {
+class PhotoGalleryViewModel @Inject constructor(flickrFetcher: FlickrFetcher): ViewModel() {
 
-    val galleryItemLD: LiveData<List<GalleryItem>>
+    val galleryItemLD: LiveData<List<GalleryItem>> = flickrFetcher.fetchPhotos()
 
     init {
-        galleryItemLD = FlickrFetcher(initializeFlickrAPI()).fetchPhotos()
+        Log.d(TAG, "viewModel init")
     }
 
-    private fun initializeFlickrAPI(): FlickrApi {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.flickr.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    override fun onCleared() {
+        super.onCleared()
 
-        return retrofit.create(FlickrApi::class.java)
+        Log.d(TAG, "view model is destroy")
+    }
+
+    companion object {
+        private const val TAG = "PhotoGalleryViewModel"
     }
 }

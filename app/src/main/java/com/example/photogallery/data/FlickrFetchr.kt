@@ -8,8 +8,9 @@ import com.example.photogallery.api.FlickrResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class FlickrFetcher(private var flickrApi: FlickrApi) {
+class FlickrFetcher @Inject constructor(private var flickrApi: FlickrApi) {
 
     fun fetchPhotos(): LiveData<List<GalleryItem>> {
         val responseLD = MutableLiveData<List<GalleryItem>>()
@@ -30,7 +31,7 @@ class FlickrFetcher(private var flickrApi: FlickrApi) {
 
                 responseLD.value = galleryItems
 
-                Log.i(TAG, "data fetching success")
+                Log.i(TAG, "‼️photo fetching")
             }
 
             override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
