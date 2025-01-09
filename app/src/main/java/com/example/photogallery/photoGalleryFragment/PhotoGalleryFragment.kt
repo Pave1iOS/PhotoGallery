@@ -16,15 +16,14 @@ import javax.inject.Inject
 class PhotoGalleryFragment: Fragment() {
 
     @Inject lateinit var flickrFetcher: FlickrFetcher
-    @Inject lateinit var viewModel: PhotoGalleryViewModel
 
-//    private val viewModel by lazy {
-//        ViewModelProvider(this)[PhotoGalleryViewModel(flickrFetcher)::class.java]
-//    }
+    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[PhotoGalleryViewModel::class.java]
+    }
 
     private lateinit var photoRecyclerView: RecyclerView
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,9 +42,6 @@ class PhotoGalleryFragment: Fragment() {
         super.onCreate(savedInstanceState)
 
         (requireActivity().application as App).appComponent.injectPhotoFragment(this)
-
-//        viewModel = ViewModelProvider(this)[PhotoGalleryViewModel::class.java]
-        viewModel = PhotoGalleryViewModel(flickrFetcher)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

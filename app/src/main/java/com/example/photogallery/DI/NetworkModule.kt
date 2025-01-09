@@ -21,5 +21,4 @@ class NetworkModule {
     fun getFlickrApi(retrofit: Retrofit): FlickrApi {
         return retrofit.create(FlickrApi::class.java)
     }
-
 }

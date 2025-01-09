@@ -31,7 +31,7 @@ class FlickrFetcher @Inject constructor(private var flickrApi: FlickrApi) {
 
                 responseLD.value = galleryItems
 
-                Log.i(TAG, "‼️photo fetching")
+                Log.i(TAG, "photo list is received (${galleryItems.size} photos) ‼️")
             }
 
             override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
