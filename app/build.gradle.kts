@@ -40,7 +40,6 @@ dependencies {
 
     kapt(libs.dagger.compiler)
     implementation(libs.dagger)
-    annotationProcessor(libs.dagger.compiler)
 
     implementation(libs.converter.gson)
     implementation(libs.gson)

@@ -2,7 +2,6 @@ package com.example.photogallery.DI
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.ViewModelFactoryDsl
 import com.example.photogallery.photoGalleryFragment.PhotoGalleryViewModel
 import dagger.Binds
 import dagger.MapKey
