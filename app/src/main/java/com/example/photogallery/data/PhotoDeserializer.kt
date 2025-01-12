@@ -1,7 +1,7 @@
-package com.example.photogallery.api
+package com.example.photogallery.data
 
 import android.util.Log
-import com.example.photogallery.data.GalleryItem
+import com.example.photogallery.api.PhotoResponse
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement

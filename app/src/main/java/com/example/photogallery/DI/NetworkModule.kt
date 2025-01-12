@@ -1,8 +1,8 @@
 package com.example.photogallery.DI
 
 import com.example.photogallery.api.FlickrApi
-import com.example.photogallery.api.PhotoDeserializer
 import com.example.photogallery.api.PhotoResponse
+import com.example.photogallery.data.PhotoDeserializer
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
