@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.photogallery.api.FlickrApi
-import com.example.photogallery.api.FlickrResponse
+import com.example.photogallery.api.PhotoResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,14 +16,13 @@ class FlickrFetcher @Inject constructor(private var flickrApi: FlickrApi) {
         val responseLD = MutableLiveData<List<GalleryItem>>()
         val flickrRequest = flickrApi.fetchPhotos()
 
-        flickrRequest.enqueue(object : Callback<FlickrResponse> {
+        flickrRequest.enqueue(object : Callback<PhotoResponse> {
             override fun onResponse(
-                call: Call<FlickrResponse>,
-                response: Response<FlickrResponse>
+                call: Call<PhotoResponse>,
+                response: Response<PhotoResponse>
             ) {
 
-                val flickrResponse = response.body()
-                val photoResponse = flickrResponse?.photos
+                val photoResponse = response.body()
                 var galleryItems = photoResponse?.galleryItems ?: mutableListOf()
                 galleryItems = galleryItems.filterNot {
                     it.url.isBlank()
@@ -34,7 +33,7 @@ class FlickrFetcher @Inject constructor(private var flickrApi: FlickrApi) {
                 Log.i(TAG, "photo list is received (${galleryItems.size} photos) ‼️")
             }
 
-            override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
+            override fun onFailure(call: Call<PhotoResponse>, t: Throwable) {
                 Log.e(TAG, "failed to fetch photo", t)
             }
         })
