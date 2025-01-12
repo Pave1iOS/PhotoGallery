@@ -1,6 +1,10 @@
 package com.example.photogallery.DI
 
 import com.example.photogallery.api.FlickrApi
+import com.example.photogallery.api.PhotoDeserializer
+import com.example.photogallery.api.PhotoResponse
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -11,9 +15,16 @@ class NetworkModule {
 
     @Provides
     fun getRetrofit(): Retrofit {
+
+        val gson = GsonBuilder()
+            .registerTypeAdapter(PhotoResponse::class.java, PhotoDeserializer())
+            .create()
+
+        val gsonFactory = GsonConverterFactory.create(gson)
+
         return Retrofit.Builder()
             .baseUrl("https://api.flickr.com/")
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(gsonFactory)
             .build()
     }
 
