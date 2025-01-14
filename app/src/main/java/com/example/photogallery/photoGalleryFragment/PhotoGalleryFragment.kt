@@ -1,16 +1,19 @@
 package com.example.photogallery.photoGalleryFragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.App
 import com.example.photogallery.R
 import com.example.photogallery.data.FlickrFetcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PhotoGalleryFragment: Fragment() {
@@ -25,6 +28,8 @@ class PhotoGalleryFragment: Fragment() {
 
     private lateinit var photoRecyclerView: RecyclerView
 
+    private val adapter = PhotoGalleryAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,6 +39,7 @@ class PhotoGalleryFragment: Fragment() {
 
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
         photoRecyclerView.layoutManager = GridLayoutManager(context, 3)
+        photoRecyclerView.adapter = adapter
 
         return view
     }
@@ -47,8 +53,12 @@ class PhotoGalleryFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.galleryItemLD.observe(viewLifecycleOwner) {
-            photoRecyclerView.adapter = PhotoGalleryAdapter(it)
+        viewModel.galleryItems.observe(viewLifecycleOwner) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                adapter.submitData(it)
+            }
+
+            Log.i(TAG, "galleryItem observe live data: $it")
         }
     }
 

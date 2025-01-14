@@ -3,6 +3,10 @@ package com.example.photogallery.data
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
 import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.PhotoResponse
 import retrofit2.Call
@@ -12,9 +16,9 @@ import javax.inject.Inject
 
 class FlickrFetcher @Inject constructor(private var flickrApi: FlickrApi) {
 
-    fun fetchPhotos(): LiveData<List<GalleryItem>> {
+    fun fetchPhotos(page: Int): LiveData<List<GalleryItem>> {
         val responseLD = MutableLiveData<List<GalleryItem>>()
-        val flickrRequest = flickrApi.fetchPhotos()
+        val flickrRequest = flickrApi.fetchPhotos(page)
 
         flickrRequest.enqueue(object : Callback<PhotoResponse> {
             override fun onResponse(
@@ -30,7 +34,8 @@ class FlickrFetcher @Inject constructor(private var flickrApi: FlickrApi) {
 
                 responseLD.value = galleryItems
 
-                Log.i(TAG, "photo list is received (${galleryItems.size} photos) ‼️")
+                Log.i(TAG, "fetch is done ✅\n" +
+                        "- photo list is received (${galleryItems.size} photos)")
             }
 
             override fun onFailure(call: Call<PhotoResponse>, t: Throwable) {
@@ -39,6 +44,13 @@ class FlickrFetcher @Inject constructor(private var flickrApi: FlickrApi) {
         })
 
         return responseLD
+    }
+
+    fun getPagingPhoto(): LiveData<PagingData<GalleryItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = { FlickrPagingSource(flickrApi) }
+        ).liveData
     }
 
     companion object {

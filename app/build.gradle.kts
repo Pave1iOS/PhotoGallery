@@ -38,6 +38,8 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.paging.runtime)
+
     kapt(libs.dagger.compiler)
     implementation(libs.dagger)
 

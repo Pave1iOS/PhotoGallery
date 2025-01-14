@@ -1,24 +1,97 @@
 package com.example.photogallery.photoGalleryFragment
 
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.data.GalleryItem
 
-class PhotoGalleryAdapter(
-    private val galleryItems: List<GalleryItem>
-): RecyclerView.Adapter<PhotoGalleryViewHolder>() {
+class PhotoGalleryAdapter: 
+    PagingDataAdapter<GalleryItem, PhotoGalleryAdapter.PhotoGalleryViewHolder>(COMPARATOR) {
+
+    override fun onBindViewHolder(holder: PhotoGalleryViewHolder, position: Int) {
+
+        getItem(position)?.let {
+            holder.bindTitle(it.title)
+        }
+
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoGalleryViewHolder {
         val textView = TextView(parent.context)
+
         return PhotoGalleryViewHolder(textView)
     }
 
-    override fun getItemCount(): Int = galleryItems.size
+    inner class PhotoGalleryViewHolder(
+        itemTextView: TextView
+    ): RecyclerView.ViewHolder(itemTextView) {
+        val bindTitle: (CharSequence) -> Unit = itemTextView::setText
+    }
 
-    override fun onBindViewHolder(holder: PhotoGalleryViewHolder, position: Int) {
-        val galleryItem = galleryItems[position]
+    companion object {
+        private const val TAG = "PhotoGalleryAdapter"
 
-        holder.bindTitle(galleryItem.title)
+        private val COMPARATOR = object : DiffUtil.ItemCallback<GalleryItem>() {
+            override fun areItemsTheSame(oldItem: GalleryItem, newItem: GalleryItem): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: GalleryItem, newItem: GalleryItem): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//class PhotoGalleryAdapter(
+//    private val galleryItems: List<GalleryItem>
+//): RecyclerView.Adapter<PhotoGalleryViewHolder>() {
+//
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoGalleryViewHolder {
+//        val textView = TextView(parent.context)
+//        return PhotoGalleryViewHolder(textView)
+//    }
+//
+//    override fun getItemCount(): Int = galleryItems.size
+//
+//    override fun onBindViewHolder(holder: PhotoGalleryViewHolder, position: Int) {
+//        val galleryItem = galleryItems[position]
+//
+//        holder.bindTitle(galleryItem.title)
+//    }
+//
+//    companion object {
+//        private val COMPORATOR = object : DiffUtil.ItemCallback<GalleryItem>() {
+//            override fun areItemsTheSame(oldItem: GalleryItem, newItem: GalleryItem): Boolean {
+//                return oldItem.id == newItem.id
+//            }
+//
+//            override fun areContentsTheSame(oldItem: GalleryItem, newItem: GalleryItem): Boolean {
+//                return oldItem == newItem
+//            }
+//
+//        }
+//    }
+//}
