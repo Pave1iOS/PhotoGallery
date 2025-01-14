@@ -3,12 +3,9 @@ package com.example.photogallery.data
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.photogallery.api.FlickrApi
-import retrofit2.await
-import javax.inject.Inject
 
-class FlickrPagingSource @Inject constructor(
-    private val flickrApi: FlickrApi
+class FlickrPagingSource (
+    private val flickrFetcher: FlickrFetcher
 ): PagingSource<Int, GalleryItem>() {
 
     override fun getRefreshKey(state: PagingState<Int, GalleryItem>): Int? {
@@ -22,18 +19,16 @@ class FlickrPagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryItem> {
 
         val page = params.key ?: INITIAL_PAGE
-        val response = flickrApi.fetchPhotos(page).await()
-        val data = response.galleryItems.filterNot { it.url.isBlank() }
+        val data = flickrFetcher.fetchPhotos(page)
 
         Log.d(TAG, "page: $page")
-        Log.d(TAG, "response: $response")
         Log.d(TAG, "data: $data")
 
         return try {
             LoadResult.Page(
                 data = data,
-                prevKey = page - 1,
-                nextKey = page + 1
+                prevKey = if (page == INITIAL_PAGE) null else page - 1,
+                nextKey = if (data.isEmpty()) null else page + 1
             )
         } catch (e: Exception) {
             LoadResult.Error(e)
