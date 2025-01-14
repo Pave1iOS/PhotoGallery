@@ -14,17 +14,13 @@ import com.example.photogallery.data.GalleryItem
 import javax.inject.Inject
 
 class PhotoGalleryViewModel @Inject constructor(
-    private val flickrFetcher: FlickrFetcher
+    flickrFetcher: FlickrFetcher
 ): ViewModel() {
 
     val galleryItems: LiveData<PagingData<GalleryItem>> = flickrFetcher.getPagingPhoto()
 
     init {
         Log.i(TAG, "view model is initialization ✅")
-    }
-
-    fun fetchPhoto(page: Int) {
-        flickrFetcher.fetchPhotos(page)
     }
 
     companion object {
