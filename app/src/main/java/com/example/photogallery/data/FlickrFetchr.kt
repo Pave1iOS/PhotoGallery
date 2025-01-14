@@ -40,13 +40,13 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
                 }
 
                 override fun onFailure(call: Call<PhotoResponse>, t: Throwable) {
-                    continuation.resumeWithException(t)
+                    continuation.cancel(t)
                     Log.e(TAG, "failed to fetch photo", t)
                 }
             })
 
             continuation.invokeOnCancellation {
-                flickrRequest.cancel()
+                throw RuntimeException("coroutine canceled ‼️", it)
             }
         }
     }
