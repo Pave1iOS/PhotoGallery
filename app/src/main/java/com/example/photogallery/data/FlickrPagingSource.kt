@@ -3,8 +3,9 @@ package com.example.photogallery.data
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import javax.inject.Inject
 
-class FlickrPagingSource (
+class FlickrPagingSource @Inject constructor(
     private val flickrFetcher: FlickrFetcher
 ): PagingSource<Int, GalleryItem>() {
 

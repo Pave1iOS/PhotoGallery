@@ -14,7 +14,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 

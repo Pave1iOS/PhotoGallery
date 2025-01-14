@@ -12,5 +12,11 @@ class App: Application() {
         super.onCreate()
 
         appComponent = DaggerAppComponent.factory().create(this)
+        instance = this
+    }
+
+    companion object {
+        lateinit var instance: App
+            private set
     }
 }

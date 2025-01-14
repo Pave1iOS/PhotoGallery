@@ -2,6 +2,7 @@ package com.example.photogallery.DI
 
 import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.PhotoResponse
+import com.example.photogallery.data.FlickrFetcher
 import com.example.photogallery.data.PhotoDeserializer
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -30,5 +31,10 @@ class NetworkModule {
     @Provides
     fun getFlickrApi(retrofit: Retrofit): FlickrApi {
         return retrofit.create(FlickrApi::class.java)
+    }
+
+    @Provides
+    fun getFlickrFetcher(flickrApi: FlickrApi): FlickrFetcher {
+        return FlickrFetcher(flickrApi)
     }
 }

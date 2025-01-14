@@ -8,7 +8,7 @@ import dagger.Component
 @Component(modules = [NetworkModule::class, ViewModelModule::class])
 interface AppComponent {
 
-    fun injectPhotoFragment(fragment: PhotoGalleryFragment)
+    fun inject(photoGalleryFragment: PhotoGalleryFragment)
 
     @Component.Factory
     interface Factory {
