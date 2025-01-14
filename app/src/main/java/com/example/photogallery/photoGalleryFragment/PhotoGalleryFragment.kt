@@ -47,7 +47,7 @@ class PhotoGalleryFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (requireActivity().application as App).appComponent.inject(this)
+        App.instance.appComponent.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
