@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.map
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.App
@@ -57,8 +58,6 @@ class PhotoGalleryFragment: Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 adapter.submitData(it)
             }
-
-            Log.i(TAG, "galleryItem observe live data: $it")
         }
     }
 

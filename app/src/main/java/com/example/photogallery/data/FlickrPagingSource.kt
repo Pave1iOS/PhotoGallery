@@ -10,7 +10,6 @@ class FlickrPagingSource @Inject constructor(
 ): PagingSource<Int, GalleryItem>() {
 
     override fun getRefreshKey(state: PagingState<Int, GalleryItem>): Int? {
-        Log.d(TAG, "state: $state")
         return state.anchorPosition?.let {
             state.closestPageToPosition(it)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(it)?.nextKey?.minus(1)
@@ -23,7 +22,7 @@ class FlickrPagingSource @Inject constructor(
         val data = flickrFetcher.fetchPhotos(page)
 
         Log.d(TAG, "page: $page")
-        Log.d(TAG, "data: $data")
+        Log.d(TAG, " load: ${data.size} photos")
 
         return try {
             LoadResult.Page(
