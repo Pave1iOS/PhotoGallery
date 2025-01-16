@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -13,7 +14,6 @@ import androidx.paging.map
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.App
-import com.example.photogallery.DynamicColumnCalculation
 import com.example.photogallery.R
 import com.example.photogallery.data.FlickrFetcher
 import kotlinx.coroutines.flow.Flow
@@ -42,7 +42,6 @@ class PhotoGalleryFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_photo_gallery, container,false)
 
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
-        photoRecyclerView.layoutManager = GridLayoutManager(context, 3)
         photoRecyclerView.adapter = adapter
 
         return view
@@ -67,8 +66,37 @@ class PhotoGalleryFragment: Fragment() {
     override fun onStart() {
         super.onStart()
 
-//        DynamicColumnCalculation().calculateDynamicColumn(photoRecyclerView)
+        calculateDynamicColumnWithRecyclerView(photoRecyclerView)
 
+    }
+
+    private fun calculateDynamicColumnWithRecyclerView(view: RecyclerView) {
+
+        // Ширина столбца
+        val columnWidth = 350
+
+        val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+
+                // получение ширины и высоты представления
+                val width = view.width
+                val height = view.height
+
+                Log.d(TAG, "scene size:\nwidth = $width height = $height")
+
+                // выбисление максимального значения (либо a либо b)
+                val spanCount = maxOf(1, width / columnWidth)
+
+                //утасновка этого значения в параметре количества столбцов
+                view.layoutManager = GridLayoutManager(context, spanCount)
+
+                // удаление слушателя что бы он не вызывался циклически при добавление элемента
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+            }
+        }
+
+        // добавляем слушателя к view
+        view.viewTreeObserver.addOnGlobalLayoutListener(listener)
     }
 
     companion object {
