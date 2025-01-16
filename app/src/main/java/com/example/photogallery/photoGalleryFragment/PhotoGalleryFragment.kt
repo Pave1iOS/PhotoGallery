@@ -8,12 +8,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.cachedIn
 import androidx.paging.map
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.App
+import com.example.photogallery.DynamicColumnCalculation
 import com.example.photogallery.R
 import com.example.photogallery.data.FlickrFetcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -59,6 +62,13 @@ class PhotoGalleryFragment: Fragment() {
                 adapter.submitData(it)
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+//        DynamicColumnCalculation().calculateDynamicColumn(photoRecyclerView)
+
     }
 
     companion object {

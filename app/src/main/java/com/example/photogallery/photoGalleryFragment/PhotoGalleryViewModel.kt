@@ -2,22 +2,24 @@ package com.example.photogallery.photoGalleryFragment
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import androidx.paging.liveData
-import com.example.photogallery.api.FlickrApi
+import androidx.paging.cachedIn
 import com.example.photogallery.data.FlickrFetcher
-import com.example.photogallery.data.FlickrPagingSource
 import com.example.photogallery.data.GalleryItem
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class PhotoGalleryViewModel @Inject constructor(
     flickrFetcher: FlickrFetcher
 ): ViewModel() {
 
-    val galleryItems: LiveData<PagingData<GalleryItem>> = flickrFetcher.getPagingPhoto()
+    val galleryItems = flickrFetcher.getPagingPhoto().cachedIn(viewModelScope)
 
     init {
         Log.i(TAG, "view model is initialization ✅")
