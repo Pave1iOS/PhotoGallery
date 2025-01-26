@@ -13,18 +13,18 @@ class ThumbnailDownloader<in T>: HandlerThread(TAG) {
     }
 
     fun queueThumbnail(url: String) {
-        Log.i(TAG, "Download picture: $url")
+        Log.i(TAG, "⬇️Download picture: $url")
     }
 
     fun startThread() {
-        Log.i(TAG, "Starting background thread")
+        Log.i(TAG, "✅Starting background thread")
 
         start()
         looper
     }
 
     fun stopThread() {
-        Log.i(TAG, "Destroying background thread")
+        Log.i(TAG, "⛔️Destroying background thread")
 
         quit()
     }
