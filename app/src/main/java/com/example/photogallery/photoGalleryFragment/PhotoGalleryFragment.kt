@@ -32,7 +32,7 @@ class PhotoGalleryFragment: Fragment() {
 
     private lateinit var photoRecyclerView: RecyclerView
 
-    private val adapter = PhotoGalleryAdapter()
+    private lateinit var adapter: PhotoGalleryAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +42,8 @@ class PhotoGalleryFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_photo_gallery, container,false)
 
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
+        adapter = PhotoGalleryAdapter(layoutInflater, requireContext())
+
         photoRecyclerView.adapter = adapter
 
         return view
