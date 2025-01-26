@@ -1,19 +1,12 @@
 package com.example.photogallery.photoGalleryFragment
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.photogallery.data.FlickrFetcher
-import com.example.photogallery.data.GalleryItem
-import kotlinx.coroutines.launch
+import com.example.photogallery.data.ThumbnailDownloader
 import javax.inject.Inject
-import androidx.paging.cachedIn
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 class PhotoGalleryViewModel @Inject constructor(
     flickrFetcher: FlickrFetcher
@@ -21,8 +14,26 @@ class PhotoGalleryViewModel @Inject constructor(
 
     val galleryItems = flickrFetcher.getPagingPhoto().cachedIn(viewModelScope)
 
+    private var thumbnailDownloader:
+            ThumbnailDownloader<PhotoGalleryAdapter.PhotoGalleryViewHolder> = ThumbnailDownloader()
+
+    private var pictureArray = mutableSetOf<String>()
+
     init {
         Log.i(TAG, "view model is initialization ✅")
+        thumbnailDownloader.startThread()
+    }
+
+    fun downloadPicture(url: String) {
+        if (!pictureArray.contains(url)) {
+            thumbnailDownloader.queueThumbnail(url)
+            pictureArray.add(url)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        thumbnailDownloader.stopThread()
     }
 
     companion object {

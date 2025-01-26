@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.App
 import com.example.photogallery.R
 import com.example.photogallery.data.FlickrFetcher
+import com.example.photogallery.data.ThumbnailDownloader
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +24,6 @@ import javax.inject.Inject
 class PhotoGalleryFragment: Fragment() {
 
     @Inject lateinit var flickrFetcher: FlickrFetcher
-
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel by lazy {
@@ -31,7 +31,6 @@ class PhotoGalleryFragment: Fragment() {
     }
 
     private lateinit var photoRecyclerView: RecyclerView
-
     private lateinit var adapter: PhotoGalleryAdapter
 
     override fun onCreateView(
@@ -42,7 +41,11 @@ class PhotoGalleryFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_photo_gallery, container,false)
 
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
-        adapter = PhotoGalleryAdapter(layoutInflater, requireContext())
+        adapter = PhotoGalleryAdapter(
+            layoutInflater,
+            requireContext(),
+            viewModel
+        )
 
         photoRecyclerView.adapter = adapter
 

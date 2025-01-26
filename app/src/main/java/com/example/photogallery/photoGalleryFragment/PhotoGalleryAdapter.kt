@@ -15,14 +15,11 @@ import com.example.photogallery.data.GalleryItem
 
 class PhotoGalleryAdapter(
     private val layoutInflater: LayoutInflater,
-    private val context: Context
+    private val context: Context,
+    private val viewModel: PhotoGalleryViewModel
 ): PagingDataAdapter<GalleryItem, PhotoGalleryAdapter.PhotoGalleryViewHolder>(COMPARATOR) {
 
     override fun onBindViewHolder(holder: PhotoGalleryViewHolder, position: Int) {
-
-        getItem(position)?.let {
-//            holder.bindDrawable(it.url)
-        }
 
         val placeholder = ContextCompat.getDrawable(
             context,
@@ -31,6 +28,9 @@ class PhotoGalleryAdapter(
 
         holder.bindDrawable(placeholder)
 
+        getItem(position)?.let {
+            viewModel.downloadPicture(it.url)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoGalleryViewHolder {
