@@ -1,6 +1,5 @@
 package com.example.photogallery.photoGalleryFragment
 
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.paging.PagingDataAdapter
