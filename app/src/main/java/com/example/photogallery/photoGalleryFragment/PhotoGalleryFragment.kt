@@ -9,15 +9,11 @@ import android.view.ViewTreeObserver
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.cachedIn
-import androidx.paging.map
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.App
 import com.example.photogallery.R
 import com.example.photogallery.data.FlickrFetcher
-import com.example.photogallery.data.ThumbnailDownloader
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,11 +37,7 @@ class PhotoGalleryFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_photo_gallery, container,false)
 
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
-        adapter = PhotoGalleryAdapter(
-            layoutInflater,
-            requireContext(),
-            viewModel
-        )
+        adapter = PhotoGalleryAdapter(layoutInflater)
 
         photoRecyclerView.adapter = adapter
 

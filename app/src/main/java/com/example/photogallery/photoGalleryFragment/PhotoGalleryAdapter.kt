@@ -1,35 +1,29 @@
 package com.example.photogallery.photoGalleryFragment
 
-import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.R
 import com.example.photogallery.data.GalleryItem
+import com.squareup.picasso.Picasso
 
 class PhotoGalleryAdapter(
-    private val layoutInflater: LayoutInflater,
-    private val context: Context,
-    private val viewModel: PhotoGalleryViewModel
+    private val layoutInflater: LayoutInflater
 ): PagingDataAdapter<GalleryItem, PhotoGalleryAdapter.PhotoGalleryViewHolder>(COMPARATOR) {
 
     override fun onBindViewHolder(holder: PhotoGalleryViewHolder, position: Int) {
 
-        val placeholder = ContextCompat.getDrawable(
-            context,
-            R.drawable.image_placeholder
-        ) ?: ColorDrawable()
-
-        holder.bindDrawable(placeholder)
-
         getItem(position)?.let {
-            viewModel.downloadPicture(holder, it.url)
+
+            Picasso.get()
+                .load(it.url)
+                .placeholder(R.drawable.image_placeholder)
+                .error(android.R.drawable.ic_menu_close_clear_cancel)
+                .into(holder.itemImageView)
         }
     }
 
@@ -44,7 +38,7 @@ class PhotoGalleryAdapter(
     }
 
     inner class PhotoGalleryViewHolder(
-        itemImageView: ImageView
+        val itemImageView: ImageView
     ): RecyclerView.ViewHolder(itemImageView) {
         val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
     }

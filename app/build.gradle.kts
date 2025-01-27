@@ -38,6 +38,7 @@ android {
 
 dependencies {
 
+    implementation(libs.picasso)
     implementation(libs.androidx.paging.runtime)
 
     kapt(libs.dagger.compiler)
