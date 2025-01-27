@@ -14,8 +14,8 @@ class PhotoGalleryViewModel @Inject constructor(
 
     val galleryItems = flickrFetcher.getPagingPhoto().cachedIn(viewModelScope)
 
-    private var thumbnailDownloader:
-            ThumbnailDownloader<PhotoGalleryAdapter.PhotoGalleryViewHolder> = ThumbnailDownloader()
+    private var thumbnailDownloader: ThumbnailDownloader<PhotoGalleryAdapter.PhotoGalleryViewHolder> =
+        ThumbnailDownloader(flickrFetcher)
 
     private var pictureArray = mutableSetOf<String>()
 
@@ -24,9 +24,9 @@ class PhotoGalleryViewModel @Inject constructor(
         thumbnailDownloader.startThread()
     }
 
-    fun downloadPicture(url: String) {
+    fun downloadPicture(holder: PhotoGalleryAdapter.PhotoGalleryViewHolder, url: String) {
         if (!pictureArray.contains(url)) {
-            thumbnailDownloader.queueThumbnail(url)
+            thumbnailDownloader.queueThumbnail(holder, url)
             pictureArray.add(url)
         }
     }

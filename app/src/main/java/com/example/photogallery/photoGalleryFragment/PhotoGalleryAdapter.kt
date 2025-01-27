@@ -29,7 +29,7 @@ class PhotoGalleryAdapter(
         holder.bindDrawable(placeholder)
 
         getItem(position)?.let {
-            viewModel.downloadPicture(it.url)
+            viewModel.downloadPicture(holder, it.url)
         }
     }
 
