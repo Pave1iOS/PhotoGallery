@@ -62,13 +62,6 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
         ).liveData
     }
 
-    @WorkerThread
-    fun fetchPhoto(url: String): Bitmap? {
-        val response = flickrApi.fetchURLBytes(url).execute()
-        val bitmap = response.body()?.byteStream()?.use(BitmapFactory::decodeStream)
-        return bitmap
-    }
-
     companion object {
         private const val TAG = "FlickrFetcher"
     }
