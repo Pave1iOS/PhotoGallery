@@ -3,9 +3,13 @@ package com.example.photogallery.photoGalleryFragment
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -18,7 +22,7 @@ import com.example.photogallery.data.PagerFetcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class PhotoGalleryFragment: Fragment() {
+class PhotoGalleryFragment: Fragment(), MenuProvider {
 
     @Inject lateinit var pagerFetcher: PagerFetcher
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -59,6 +63,8 @@ class PhotoGalleryFragment: Fragment() {
                 adapter.submitData(it)
             }
         }
+
+        requireActivity().addMenuProvider(this, viewLifecycleOwner)
     }
 
     override fun onStart() {
@@ -66,6 +72,14 @@ class PhotoGalleryFragment: Fragment() {
 
         calculateDynamicColumnWithRecyclerView(photoRecyclerView)
 
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.fragment_photo_gallery, menu)
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return true
     }
 
     private fun calculateDynamicColumnWithRecyclerView(view: RecyclerView) {
