@@ -2,14 +2,14 @@ package com.example.photogallery.data
 
 import android.util.Log
 import com.example.photogallery.api.FlickrApi
-import com.example.photogallery.api.GalleryItem
 import com.example.photogallery.api.FlickrResponse
-import kotlinx.coroutines.suspendCancellableCoroutine
+import com.example.photogallery.api.GalleryItem
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
@@ -22,7 +22,7 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
     }
 
     private suspend fun fetchPhotoMetadata(flickrRequest: Call<FlickrResponse>): List<GalleryItem> {
-        return suspendCancellableCoroutine { continuation ->
+        return suspendCoroutine { continuation ->
 
             flickrRequest.enqueue(object : Callback<FlickrResponse> {
                 override fun onResponse(
@@ -42,13 +42,8 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
                 override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
                     Log.e(TAG, "failed to fetch photo", t)
-                    continuation.cancel(t)
                 }
             })
-
-            continuation.invokeOnCancellation {
-                throw RuntimeException("coroutine canceled ‼️", it)
-            }
         }
     }
 

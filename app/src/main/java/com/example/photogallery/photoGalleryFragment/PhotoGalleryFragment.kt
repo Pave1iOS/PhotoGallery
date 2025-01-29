@@ -58,11 +58,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.searchPhotoLD.observe(viewLifecycleOwner) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                adapter.submitData(it)
-            }
-        }
+        listPhoto()
 
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
     }
@@ -85,13 +81,21 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
                     Log.i(TAG, "Search text: $query")
-                    viewModel.searchPhoto(query)
+
+
                     return true
                 }
 
                 override fun onQueryTextChange(newText: String): Boolean {
-                    Log.i(TAG, "Search text: $newText")
-                    return false
+                    Log.i(TAG, "onQueryTextChange: $newText")
+
+                    if (newText.isNotEmpty()) {
+                        searchPhoto(newText)
+                    } else {
+                        listPhoto()
+                    }
+
+                    return true
                 }
             })
         }
@@ -128,6 +132,22 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         // добавляем слушателя к view
         view.viewTreeObserver.addOnGlobalLayoutListener(listener)
+    }
+
+    private fun searchPhoto(text: String) {
+        viewModel.searchPhoto(text).observe(viewLifecycleOwner) {
+            lifecycleScope.launch {
+                adapter.submitData(it)
+            }
+        }
+    }
+
+    private fun listPhoto() {
+        viewModel.getPhoto().observe(viewLifecycleOwner) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                adapter.submitData(it)
+            }
+        }
     }
 
     companion object {
