@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +18,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.App
 import com.example.photogallery.R
-import com.example.photogallery.data.FlickrFetcher
 import com.example.photogallery.data.PagerFetcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -58,7 +58,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.searchPhoto("cat").observe(viewLifecycleOwner) {
+        viewModel.searchPhotoLD.observe(viewLifecycleOwner) {
             viewLifecycleOwner.lifecycleScope.launch {
                 adapter.submitData(it)
             }
@@ -76,6 +76,25 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.fragment_photo_gallery, menu)
+
+        val menuSearch = menu.findItem(R.id.menu_item_search)
+        val searchView = menuSearch.actionView as SearchView
+
+        searchView.apply {
+
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    Log.i(TAG, "Search text: $query")
+                    viewModel.searchPhoto(query)
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String): Boolean {
+                    Log.i(TAG, "Search text: $newText")
+                    return false
+                }
+            })
+        }
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
