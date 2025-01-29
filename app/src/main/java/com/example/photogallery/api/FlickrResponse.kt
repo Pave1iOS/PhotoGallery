@@ -1,6 +1,11 @@
-package com.example.photogallery.data
+package com.example.photogallery.api
 
 import com.google.gson.annotations.SerializedName
+
+class FlickrResponse {
+    @SerializedName("photo")
+    lateinit var galleryItems: List<GalleryItem>
+}
 
 data class GalleryItem(
     var title: String = "",

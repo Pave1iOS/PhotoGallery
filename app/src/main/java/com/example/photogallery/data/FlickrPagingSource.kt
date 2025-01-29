@@ -3,6 +3,7 @@ package com.example.photogallery.data
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.example.photogallery.api.GalleryItem
 
 class FlickrPagingSource(
     private val loader: suspend (page: Int) -> List<GalleryItem>

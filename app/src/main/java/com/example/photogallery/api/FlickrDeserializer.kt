@@ -1,7 +1,6 @@
-package com.example.photogallery.data
+package com.example.photogallery.api
 
 import android.util.Log
-import com.example.photogallery.api.PhotoResponse
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -9,12 +8,12 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
-class PhotoDeserializer : JsonDeserializer<PhotoResponse> {
+class FlickrDeserializer : JsonDeserializer<FlickrResponse> {
     override fun deserialize(
         json: JsonElement,
         typeOfT: Type?,
         context: JsonDeserializationContext?
-    ): PhotoResponse {
+    ): FlickrResponse {
 
         if (!json.isJsonObject) {
             throw JsonSyntaxException("json: JSON Object but found: ${json.javaClass.simpleName}")
@@ -45,7 +44,7 @@ class PhotoDeserializer : JsonDeserializer<PhotoResponse> {
 
         Log.d(TAG, "galleryItems: $galleryItems")
 
-        return PhotoResponse().apply {
+        return FlickrResponse().apply {
             this.galleryItems = galleryItems
         }
     }

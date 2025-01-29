@@ -5,6 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.liveData
+import com.example.photogallery.api.GalleryItem
 import javax.inject.Inject
 
 class PagerFetcher @Inject constructor(

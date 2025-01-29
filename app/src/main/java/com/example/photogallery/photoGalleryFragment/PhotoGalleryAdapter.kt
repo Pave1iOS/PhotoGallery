@@ -8,7 +8,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.R
-import com.example.photogallery.data.GalleryItem
+import com.example.photogallery.api.GalleryItem
 import com.squareup.picasso.Picasso
 
 class PhotoGalleryAdapter(
