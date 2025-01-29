@@ -17,20 +17,6 @@ import kotlin.coroutines.resume
 
 class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
-    fun getPagingPhoto(): LiveData<PagingData<GalleryItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = PAGE_SIZE),
-            pagingSourceFactory = { FlickrPagingSource { page -> fetchPhotos(page) } }
-        ).liveData
-    }
-
-    fun searchPagingPhoto(text: String): LiveData<PagingData<GalleryItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = PAGE_SIZE),
-            pagingSourceFactory = { FlickrPagingSource { searchPhotos(text) } }
-        ).liveData
-    }
-
     suspend fun fetchPhotos(page: Int): List<GalleryItem> {
         return fetchPhotoMetadata(flickrApi.fetchPhotos(page))
     }
@@ -72,6 +58,5 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
     companion object {
         private const val TAG = "FlickrFetcher"
-        private const val PAGE_SIZE = 100
     }
 }

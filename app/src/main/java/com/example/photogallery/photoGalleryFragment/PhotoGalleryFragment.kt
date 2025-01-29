@@ -14,12 +14,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.photogallery.App
 import com.example.photogallery.R
 import com.example.photogallery.data.FlickrFetcher
+import com.example.photogallery.data.PagerFetcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PhotoGalleryFragment: Fragment() {
 
-    @Inject lateinit var flickrFetcher: FlickrFetcher
+    @Inject lateinit var pagerFetcher: PagerFetcher
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel by lazy {
@@ -58,12 +59,6 @@ class PhotoGalleryFragment: Fragment() {
                 adapter.submitData(it)
             }
         }
-
-//        viewModel.getPhoto().observe(viewLifecycleOwner) {
-//            viewLifecycleOwner.lifecycleScope.launch {
-//                adapter.submitData(it)
-//            }
-//        }
     }
 
     override fun onStart() {
