@@ -25,14 +25,14 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
     fun getPagingPhoto(): LiveData<PagingData<GalleryItem>> {
         return Pager(
             config = PagingConfig(pageSize = 100),
-            pagingSourceFactory = { FlickrPagingSource(this) }
+            pagingSourceFactory = { FlickrPS { page -> fetchPhotos(page) } }
         ).liveData
     }
 
     fun searchPagingPhoto(text: String): LiveData<PagingData<GalleryItem>> {
         return Pager(
             config = PagingConfig(pageSize = 100),
-            pagingSourceFactory = {FlickrSearchPagingSource(this, text)}
+            pagingSourceFactory = { FlickrPS { searchPhotos(text) } }
         ).liveData
     }
 
