@@ -2,7 +2,7 @@ package com.example.photogallery.DI
 
 import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.FlickrResponse
-import com.example.photogallery.api.PhotoInterceptor
+import com.example.photogallery.api.FlickrInterceptor
 import com.example.photogallery.data.FlickrFetcher
 import com.example.photogallery.data.PagerFetcher
 import com.example.photogallery.api.FlickrDeserializer
@@ -26,7 +26,7 @@ class NetworkModule {
         val gsonFactory = GsonConverterFactory.create(gson)
 
         val client = OkHttpClient.Builder()
-            .addInterceptor(PhotoInterceptor())
+            .addInterceptor(FlickrInterceptor())
             .build()
 
         return Retrofit.Builder()

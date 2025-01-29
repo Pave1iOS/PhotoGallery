@@ -3,7 +3,7 @@ package com.example.photogallery.api
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class PhotoInterceptor: Interceptor {
+class FlickrInterceptor: Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val origRequest = chain.request()
