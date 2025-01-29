@@ -1,9 +1,6 @@
 package com.example.photogallery.data
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -12,11 +9,9 @@ import androidx.paging.liveData
 import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.PhotoResponse
 import kotlinx.coroutines.suspendCancellableCoroutine
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.http.Url
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
@@ -24,15 +19,15 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
     fun getPagingPhoto(): LiveData<PagingData<GalleryItem>> {
         return Pager(
-            config = PagingConfig(pageSize = 100),
-            pagingSourceFactory = { FlickrPS { page -> fetchPhotos(page) } }
+            config = PagingConfig(pageSize = PAGE_SIZE),
+            pagingSourceFactory = { FlickrPagingSource { page -> fetchPhotos(page) } }
         ).liveData
     }
 
     fun searchPagingPhoto(text: String): LiveData<PagingData<GalleryItem>> {
         return Pager(
-            config = PagingConfig(pageSize = 100),
-            pagingSourceFactory = { FlickrPS { searchPhotos(text) } }
+            config = PagingConfig(pageSize = PAGE_SIZE),
+            pagingSourceFactory = { FlickrPagingSource { searchPhotos(text) } }
         ).liveData
     }
 
@@ -77,5 +72,6 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
     companion object {
         private const val TAG = "FlickrFetcher"
+        private const val PAGE_SIZE = 100
     }
 }

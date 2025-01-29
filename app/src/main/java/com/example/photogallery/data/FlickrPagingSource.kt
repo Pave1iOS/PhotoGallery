@@ -3,12 +3,10 @@ package com.example.photogallery.data
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import javax.inject.Inject
 
-class FlickrPagingSource @Inject constructor(
-    private val flickrFetcher: FlickrFetcher
+class FlickrPagingSource(
+    private val loader: suspend (page: Int) -> List<GalleryItem>
 ): PagingSource<Int, GalleryItem>() {
-
     override fun getRefreshKey(state: PagingState<Int, GalleryItem>): Int? {
         return state.anchorPosition?.let {
             state.closestPageToPosition(it)?.prevKey?.plus(1)
@@ -19,10 +17,10 @@ class FlickrPagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GalleryItem> {
 
         val page = params.key ?: INITIAL_PAGE
-        val data = flickrFetcher.fetchPhotos(page)
+        val data = loader(page)
 
         Log.d(TAG, "page: $page")
-        Log.d(TAG, " load: ${data.size} photos")
+        Log.d(TAG, "load: ${data.size} photos")
 
         return try {
             LoadResult.Page(
