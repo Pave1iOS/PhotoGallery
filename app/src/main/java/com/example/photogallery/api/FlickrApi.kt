@@ -9,5 +9,5 @@ interface FlickrApi {
     fun fetchPhotos(@Query("page") page: Int): Call<PhotoResponse>
 
     @GET("services/rest/?method=flickr.photos.search")
-    fun searchPhotos(@Query("text") text: String): Call<FlickrResponse>
+    fun searchPhotos(@Query("text") text: String): Call<PhotoResponse>
 }

@@ -22,10 +22,30 @@ import kotlin.coroutines.resume
 
 class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
-    suspend fun fetchPhotos(page: Int): List<GalleryItem> {
-        return suspendCancellableCoroutine { continuation ->
+    fun getPagingPhoto(): LiveData<PagingData<GalleryItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = 100),
+            pagingSourceFactory = { FlickrPagingSource(this) }
+        ).liveData
+    }
 
-            val flickrRequest = flickrApi.fetchPhotos(page)
+    fun searchPagingPhoto(text: String): LiveData<PagingData<GalleryItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = 100),
+            pagingSourceFactory = {FlickrSearchPagingSource(this, text)}
+        ).liveData
+    }
+
+    suspend fun fetchPhotos(page: Int): List<GalleryItem> {
+        return fetchPhotoMetadata(flickrApi.fetchPhotos(page))
+    }
+
+    suspend fun searchPhotos(text: String): List<GalleryItem> {
+        return fetchPhotoMetadata(flickrApi.searchPhotos(text))
+    }
+
+    private suspend fun fetchPhotoMetadata(flickrRequest: Call<PhotoResponse>): List<GalleryItem> {
+        return suspendCancellableCoroutine { continuation ->
 
             flickrRequest.enqueue(object : Callback<PhotoResponse> {
                 override fun onResponse(
@@ -53,13 +73,6 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
                 throw RuntimeException("coroutine canceled ‼️", it)
             }
         }
-    }
-
-    fun getPagingPhoto(): LiveData<PagingData<GalleryItem>> {
-        return Pager(
-            config = PagingConfig(pageSize = 100),
-            pagingSourceFactory = { FlickrPagingSource(this) }
-        ).liveData
     }
 
     companion object {

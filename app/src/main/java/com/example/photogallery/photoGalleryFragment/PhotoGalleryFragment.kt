@@ -53,11 +53,17 @@ class PhotoGalleryFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.galleryItems.observe(viewLifecycleOwner) {
+        viewModel.searchPhoto("cat").observe(viewLifecycleOwner) {
             viewLifecycleOwner.lifecycleScope.launch {
                 adapter.submitData(it)
             }
         }
+
+//        viewModel.galleryItems.observe(viewLifecycleOwner) {
+//            viewLifecycleOwner.lifecycleScope.launch {
+//                adapter.submitData(it)
+//            }
+//        }
     }
 
     override fun onStart() {
