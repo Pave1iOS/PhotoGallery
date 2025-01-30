@@ -9,13 +9,16 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.photogallery.App
 import com.example.photogallery.R
 import com.example.photogallery.data.PagerFetcher
@@ -33,6 +36,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
     private lateinit var photoRecyclerView: RecyclerView
     private lateinit var adapter: PhotoGalleryAdapter
+    private lateinit var gifImageView: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +44,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_photo_gallery, container,false)
+        gifImageView = view.findViewById(R.id.load_animation)
 
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
         adapter = PhotoGalleryAdapter(layoutInflater)
@@ -88,6 +93,8 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
                 override fun onQueryTextChange(newText: String): Boolean {
                     Log.i(TAG, "onQueryTextChange: $newText")
+
+                    playLoadAnimation(true)
 
                     if (newText.isNotEmpty()) {
                         searchPhoto(newText)
@@ -144,8 +151,38 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
     private fun listPhoto() {
         viewModel.getPhoto().observe(viewLifecycleOwner) {
-            viewLifecycleOwner.lifecycleScope.launch {
+            lifecycleScope.launch {
                 adapter.submitData(it)
+            }
+        }
+    }
+
+    private fun cleanList() {
+        lifecycleScope.launch {
+            adapter.submitData(PagingData.empty())
+        }
+    }
+
+    private fun playLoadAnimation(playAnimation: Boolean) {
+
+        val visible = when(playAnimation) {
+            true -> View.VISIBLE
+            false -> View.GONE
+        }
+
+        gifImageView.visibility = visible
+
+        when(playAnimation) {
+            true -> {
+                cleanList()
+
+                Glide.with(this)
+                    .asGif()
+                    .load(R.drawable.load_animation)
+                    .into(gifImageView)
+            }
+            false -> {
+                Glide.with(this).clear(gifImageView)
             }
         }
     }
