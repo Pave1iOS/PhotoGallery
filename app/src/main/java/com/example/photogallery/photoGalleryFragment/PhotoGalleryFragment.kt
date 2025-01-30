@@ -94,7 +94,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                 override fun onQueryTextChange(newText: String): Boolean {
                     Log.i(TAG, "onQueryTextChange: $newText")
 
-                    playLoadAnimation(true)
+
 
                     if (newText.isNotEmpty()) {
                         searchPhoto(newText)
