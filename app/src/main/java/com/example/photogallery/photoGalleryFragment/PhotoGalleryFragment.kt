@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.photogallery.App
 import com.example.photogallery.R
+import com.example.photogallery.data.FlickrFetcher
 import com.example.photogallery.data.PagerFetcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -72,7 +73,6 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         super.onStart()
 
         calculateDynamicColumnWithRecyclerView(photoRecyclerView)
-
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -92,9 +92,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                 }
 
                 override fun onQueryTextChange(newText: String): Boolean {
-                    Log.i(TAG, "onQueryTextChange: $newText")
-
-
+                    Log.i(TAG, "character is pressed: $newText")
 
                     if (newText.isNotEmpty()) {
                         searchPhoto(newText)
@@ -124,7 +122,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                 val width = view.width
                 val height = view.height
 
-                Log.d(TAG, "scene size:\nwidth = $width height = $height")
+//                Log.d(TAG, "scene size:\nwidth = $width height = $height")
 
                 // выбисление максимального значения (либо a либо b)
                 val spanCount = maxOf(1, width / columnWidth)

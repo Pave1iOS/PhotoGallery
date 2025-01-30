@@ -27,6 +27,7 @@ class PagerFetcher @Inject constructor(
     }
 
     companion object {
+        private const val TAG = "PagerFetcher"
         private const val PAGE_SIZE = 100
     }
 

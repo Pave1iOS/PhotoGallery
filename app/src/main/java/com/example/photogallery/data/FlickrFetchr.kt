@@ -1,6 +1,8 @@
 package com.example.photogallery.data
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.FlickrResponse
 import com.example.photogallery.api.GalleryItem
