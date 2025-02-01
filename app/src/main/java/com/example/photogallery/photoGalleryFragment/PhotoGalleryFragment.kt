@@ -28,6 +28,7 @@ import javax.inject.Inject
 
 class PhotoGalleryFragment: Fragment(), MenuProvider {
 
+    @Inject lateinit var flickrFetcher: FlickrFetcher
     @Inject lateinit var pagerFetcher: PagerFetcher
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -93,6 +94,9 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
                 override fun onQueryTextChange(newText: String): Boolean {
                     Log.i(TAG, "character is pressed: $newText")
+
+                    flickrFetcher.isLoading = true
+                    Log.e(TAG, "character press -> ${flickrFetcher.isLoading}")
 
                     if (newText.isNotEmpty()) {
                         searchPhoto(newText)

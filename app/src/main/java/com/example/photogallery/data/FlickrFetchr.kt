@@ -15,11 +15,17 @@ import kotlin.coroutines.suspendCoroutine
 
 class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
+    var isLoading = true
+
     suspend fun fetchPhotos(page: Int): List<GalleryItem> {
+
+        Log.e(TAG, "load is started ")
         return fetchPhotoMetadata(flickrApi.fetchPhotos(page))
     }
 
     suspend fun searchPhotos(text: String): List<GalleryItem> {
+
+        Log.e(TAG, "load is started ")
         return fetchPhotoMetadata(flickrApi.searchPhotos(text))
     }
 
@@ -37,6 +43,9 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
                     } ?: emptyList()
 
                     continuation.resume(galleryItems)
+
+                    isLoading = false
+                    Log.e(TAG, "load is finish -> $isLoading")
 
                     Log.i(TAG, "fetch is done ✅\n" +
                             "- photo list is received (${galleryItems.size} photos)")
