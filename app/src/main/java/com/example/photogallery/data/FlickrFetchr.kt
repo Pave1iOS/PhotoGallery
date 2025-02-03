@@ -48,7 +48,7 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
                         continuation.resume(galleryItems)
 
                         isLoading.value = false
-                        Log.e(TAG, "load is finish -> $isLoading")
+                        Log.e(TAG, "load is finish -> ${isLoading.value}")
 
                         Log.i(TAG, "fetch is done ✅\n" +
                                 "- photo list is received (${galleryItems.size} photos)")
