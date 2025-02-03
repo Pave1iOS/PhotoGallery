@@ -4,7 +4,6 @@ import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.FlickrResponse
 import com.example.photogallery.api.FlickrInterceptor
 import com.example.photogallery.data.FlickrFetcher
-import com.example.photogallery.data.PagerFetcher
 import com.example.photogallery.api.FlickrDeserializer
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -44,10 +43,5 @@ class NetworkModule {
     @Provides
     fun getFlickrFetcher(flickrApi: FlickrApi): FlickrFetcher {
         return FlickrFetcher(flickrApi)
-    }
-
-    @Provides
-    fun getPagerFetcher(flickrFetcher: FlickrFetcher): PagerFetcher {
-        return PagerFetcher(flickrFetcher)
     }
 }

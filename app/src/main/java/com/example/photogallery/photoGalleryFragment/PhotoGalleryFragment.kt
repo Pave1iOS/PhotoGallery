@@ -14,22 +14,17 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.photogallery.App
 import com.example.photogallery.R
 import com.example.photogallery.data.FlickrFetcher
-import com.example.photogallery.data.PagerFetcher
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PhotoGalleryFragment: Fragment(), MenuProvider {
 
     @Inject lateinit var flickrFetcher: FlickrFetcher
-    @Inject lateinit var pagerFetcher: PagerFetcher
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel by lazy {
@@ -49,7 +44,8 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         gifImageView = view.findViewById(R.id.load_animation)
 
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
-        adapter = PhotoGalleryAdapter(layoutInflater)
+
+        adapter = PhotoGalleryAdapter(inflater)
 
         photoRecyclerView.adapter = adapter
 
@@ -65,18 +61,13 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        listPhoto()
-
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
 
-        lifecycleScope.launch {
-            flickrFetcher.isLoading.collect {
+        showPhoto()
 
-
-
-            }
+        viewModel.loadingState {
+            playLoadAnimation(it)
         }
-
     }
 
     override fun onStart() {
@@ -104,12 +95,12 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                 override fun onQueryTextChange(newText: String): Boolean {
                     Log.i(TAG, "character is pressed: $newText")
 
-                    Log.e(TAG, "flickr value gone tap -> ${flickrFetcher.isLoading}")
+                    Log.e(TAG, "flickr value gone tap -> ${flickrFetcher.isLoadingState}")
 
                     if (newText.isNotEmpty()) {
                         searchPhoto(newText)
                     } else {
-                        listPhoto()
+                        showPhoto()
                     }
 
                     return true
@@ -120,6 +111,18 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return true
+    }
+
+    private fun showPhoto() {
+        viewModel.getPhoto().observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+    }
+
+    private fun searchPhoto(text: String) {
+        viewModel.searchPhoto(text).observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
     }
 
     private fun calculateDynamicColumnWithRecyclerView(view: RecyclerView) {
@@ -151,28 +154,6 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         view.viewTreeObserver.addOnGlobalLayoutListener(listener)
     }
 
-    private fun searchPhoto(text: String) {
-        viewModel.searchPhoto(text).observe(viewLifecycleOwner) {
-            lifecycleScope.launch {
-                adapter.submitData(it)
-            }
-        }
-    }
-
-    private fun listPhoto() {
-        viewModel.getPhoto().observe(viewLifecycleOwner) {
-            lifecycleScope.launch {
-                adapter.submitData(it)
-            }
-        }
-    }
-
-    private fun cleanList() {
-        lifecycleScope.launch {
-            adapter.submitData(PagingData.empty())
-        }
-    }
-
     private fun playLoadAnimation(playAnimation: Boolean) {
 
         val visible = when(playAnimation) {
@@ -184,8 +165,6 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         when(playAnimation) {
             true -> {
-                cleanList()
-
                 Glide.with(this)
                     .asGif()
                     .load(R.drawable.full_scene_load_animation)

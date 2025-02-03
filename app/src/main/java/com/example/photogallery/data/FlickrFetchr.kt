@@ -1,8 +1,6 @@
 package com.example.photogallery.data
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.FlickrResponse
 import com.example.photogallery.api.GalleryItem
@@ -18,17 +16,19 @@ import kotlin.coroutines.suspendCoroutine
 
 class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
-    var isLoading = MutableStateFlow(true)
+    var isLoadingState = MutableStateFlow(true)
 
     suspend fun fetchPhotos(page: Int): List<GalleryItem> {
-        isLoading.value = true
-        Log.e(TAG, "load is started ${isLoading.value}")
+        isLoadingState.value = true
+        Log.e(TAG, "load is started ${isLoadingState.value}")
+
         return fetchPhotoMetadata(flickrApi.fetchPhotos(page))
     }
 
     suspend fun searchPhotos(text: String): List<GalleryItem> {
-        isLoading.value = true
-        Log.e(TAG, "load is started ${isLoading.value}")
+        isLoadingState.value = true
+        Log.e(TAG, "load is started ${isLoadingState.value}")
+
         return fetchPhotoMetadata(flickrApi.searchPhotos(text))
     }
 
@@ -47,8 +47,8 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
                         continuation.resume(galleryItems)
 
-                        isLoading.value = false
-                        Log.e(TAG, "load is finish -> ${isLoading.value}")
+                        isLoadingState.value = false
+                        Log.e(TAG, "load is finish -> ${isLoadingState.value}")
 
                         Log.i(TAG, "fetch is done ✅\n" +
                                 "- photo list is received (${galleryItems.size} photos)")
