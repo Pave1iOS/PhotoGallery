@@ -68,6 +68,15 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         listPhoto()
 
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
+
+        lifecycleScope.launch {
+            flickrFetcher.isLoading.collect {
+
+
+
+            }
+        }
+
     }
 
     override fun onStart() {
@@ -95,10 +104,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                 override fun onQueryTextChange(newText: String): Boolean {
                     Log.i(TAG, "character is pressed: $newText")
 
-                    flickrFetcher.isLoading = true
-                    Log.e(TAG, "character press -> ${flickrFetcher.isLoading}")
-
-                    playLoadAnimation(flickrFetcher.isLoading)
+                    Log.e(TAG, "flickr value gone tap -> ${flickrFetcher.isLoading}")
 
                     if (newText.isNotEmpty()) {
                         searchPhoto(newText)

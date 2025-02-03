@@ -7,6 +7,7 @@ import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.FlickrResponse
 import com.example.photogallery.api.GalleryItem
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
@@ -17,17 +18,17 @@ import kotlin.coroutines.suspendCoroutine
 
 class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
-    var isLoading = true
+    var isLoading = MutableStateFlow(true)
 
     suspend fun fetchPhotos(page: Int): List<GalleryItem> {
-
-        Log.e(TAG, "load is started ")
+        isLoading.value = true
+        Log.e(TAG, "load is started ${isLoading.value}")
         return fetchPhotoMetadata(flickrApi.fetchPhotos(page))
     }
 
     suspend fun searchPhotos(text: String): List<GalleryItem> {
-
-        Log.e(TAG, "load is started ")
+        isLoading.value = true
+        Log.e(TAG, "load is started ${isLoading.value}")
         return fetchPhotoMetadata(flickrApi.searchPhotos(text))
     }
 
@@ -44,12 +45,9 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
                             it.url.isBlank()
                         } ?: emptyList()
 
-
-
-
                         continuation.resume(galleryItems)
 
-                        isLoading = false
+                        isLoading.value = false
                         Log.e(TAG, "load is finish -> $isLoading")
 
                         Log.i(TAG, "fetch is done ✅\n" +
