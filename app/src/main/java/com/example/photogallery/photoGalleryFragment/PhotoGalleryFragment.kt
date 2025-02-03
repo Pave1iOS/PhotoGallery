@@ -188,7 +188,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
                 Glide.with(this)
                     .asGif()
-                    .load(R.drawable.load_animation)
+                    .load(R.drawable.full_scene_load_animation)
                     .into(gifImageView)
             }
             false -> {

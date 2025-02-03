@@ -21,8 +21,8 @@ class PhotoGalleryAdapter(
 
             Picasso.get()
                 .load(it.url)
-                .placeholder(R.drawable.image_placeholder)
-                .error(android.R.drawable.ic_menu_close_clear_cancel)
+                .placeholder(R.drawable.image_load_animation)
+                .error(R.drawable.error_load_image)
                 .into(holder.itemImageView)
         }
     }
