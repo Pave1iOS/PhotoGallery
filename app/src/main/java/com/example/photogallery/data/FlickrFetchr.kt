@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import com.example.photogallery.api.FlickrApi
 import com.example.photogallery.api.FlickrResponse
 import com.example.photogallery.api.GalleryItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,31 +32,35 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
     }
 
     private suspend fun fetchPhotoMetadata(flickrRequest: Call<FlickrResponse>): List<GalleryItem> {
-        return suspendCoroutine { continuation ->
+        return withContext(Dispatchers.IO) {
+            suspendCoroutine { continuation ->
+                flickrRequest.enqueue(object : Callback<FlickrResponse> {
+                    override fun onResponse(
+                        call: Call<FlickrResponse>,
+                        response: Response<FlickrResponse>
+                    ) {
+                        val photoResponse = response.body()
+                        val galleryItems = photoResponse?.galleryItems?.filterNot {
+                            it.url.isBlank()
+                        } ?: emptyList()
 
-            flickrRequest.enqueue(object : Callback<FlickrResponse> {
-                override fun onResponse(
-                    call: Call<FlickrResponse>,
-                    response: Response<FlickrResponse>
-                ) {
-                    val photoResponse = response.body()
-                    val galleryItems = photoResponse?.galleryItems?.filterNot {
-                        it.url.isBlank()
-                    } ?: emptyList()
 
-                    continuation.resume(galleryItems)
 
-                    isLoading = false
-                    Log.e(TAG, "load is finish -> $isLoading")
 
-                    Log.i(TAG, "fetch is done ✅\n" +
-                            "- photo list is received (${galleryItems.size} photos)")
-                }
+                        continuation.resume(galleryItems)
 
-                override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
-                    Log.e(TAG, "failed to fetch photo", t)
-                }
-            })
+                        isLoading = false
+                        Log.e(TAG, "load is finish -> $isLoading")
+
+                        Log.i(TAG, "fetch is done ✅\n" +
+                                "- photo list is received (${galleryItems.size} photos)")
+                    }
+
+                    override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
+                        Log.e(TAG, "failed to fetch photo", t)
+                    }
+                })
+            }
         }
     }
 

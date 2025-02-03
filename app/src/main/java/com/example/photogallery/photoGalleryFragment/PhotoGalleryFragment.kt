@@ -98,6 +98,8 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                     flickrFetcher.isLoading = true
                     Log.e(TAG, "character press -> ${flickrFetcher.isLoading}")
 
+                    playLoadAnimation(flickrFetcher.isLoading)
+
                     if (newText.isNotEmpty()) {
                         searchPhoto(newText)
                     } else {
