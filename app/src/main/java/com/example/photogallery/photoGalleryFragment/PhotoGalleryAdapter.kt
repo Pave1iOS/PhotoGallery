@@ -19,12 +19,7 @@ class PhotoGalleryAdapter(
 
         val item = getItem(position)
 
-            Picasso.get()
-                .load(item.url)
-                .placeholder(R.drawable.image_load_animation)
-                .error(R.drawable.error_load_image)
-                .into(holder.itemImageView)
-
+        holder.bind(item)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoGalleryViewHolder {
@@ -38,9 +33,16 @@ class PhotoGalleryAdapter(
     }
 
     inner class PhotoGalleryViewHolder(
-        val itemImageView: ImageView
+        private val itemImageView: ImageView
     ): RecyclerView.ViewHolder(itemImageView) {
-        val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
+
+        fun bind(item: GalleryItem) {
+            Picasso.get()
+                .load(item.url)
+                .placeholder(R.drawable.image_load_animation)
+                .error(R.drawable.error_load_image)
+                .into(itemImageView)
+        }
     }
 
     companion object {

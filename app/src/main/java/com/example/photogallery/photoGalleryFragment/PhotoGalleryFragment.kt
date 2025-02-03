@@ -1,5 +1,6 @@
 package com.example.photogallery.photoGalleryFragment
 
+import android.icu.text.RelativeDateTimeFormatter.Direction
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.bumptech.glide.Glide
 import com.example.photogallery.App
 import com.example.photogallery.R
@@ -49,6 +51,8 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         photoRecyclerView.adapter = adapter
 
+        recyclerViewScrollListener(photoRecyclerView)
+
         return view
     }
 
@@ -63,7 +67,11 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
 
-        showPhoto()
+        viewModel.galleryItems.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+
+        viewModel.loadPhotos()
 
         viewModel.loadingState {
             playLoadAnimation(it)
@@ -88,19 +96,18 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                 override fun onQueryTextSubmit(query: String): Boolean {
                     Log.i(TAG, "Search text: $query")
 
+                    viewModel.loadPhotos(query)
 
                     return true
                 }
 
                 override fun onQueryTextChange(newText: String): Boolean {
-                    Log.i(TAG, "character is pressed: $newText")
+                    Log.d(TAG, "search query: $newText")
 
-                    Log.e(TAG, "flickr value gone tap -> ${flickrFetcher.isLoadingState}")
-
-                    if (newText.isNotEmpty()) {
-                        searchPhoto(newText)
+                    if (newText.isNotBlank()) {
+                        viewModel.searchPhotos(newText)
                     } else {
-                        showPhoto()
+                        viewModel.loadPhotos()
                     }
 
                     return true
@@ -111,18 +118,6 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return true
-    }
-
-    private fun showPhoto() {
-        viewModel.getPhoto().observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-        }
-    }
-
-    private fun searchPhoto(text: String) {
-        viewModel.searchPhoto(text).observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-        }
     }
 
     private fun calculateDynamicColumnWithRecyclerView(view: RecyclerView) {
@@ -174,6 +169,18 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                 Glide.with(this).clear(gifImageView)
             }
         }
+    }
+
+    private fun recyclerViewScrollListener(recyclerView: RecyclerView) {
+        recyclerView.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (!recyclerView.canScrollVertically(1)) {
+                    viewModel.loadPhotos()
+                }
+            }
+        })
     }
 
     companion object {

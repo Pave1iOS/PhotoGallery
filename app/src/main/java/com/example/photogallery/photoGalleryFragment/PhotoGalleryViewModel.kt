@@ -15,28 +15,46 @@ class PhotoGalleryViewModel @Inject constructor(
     private val flickrFetcher: FlickrFetcher
 ): ViewModel() {
 
-    private var galleryItems = MutableLiveData<List<GalleryItem>>()
+    private var _galleryItems = MutableLiveData<List<GalleryItem>>()
+    val galleryItems: LiveData<List<GalleryItem>> get() = _galleryItems
 
-    init {
-        Log.i(TAG, "view model is initialization ✅")
-    }
+    private var page = 1
 
-    fun getPhoto(): LiveData<List<GalleryItem>> {
-        viewModelScope.launch(Dispatchers.IO) {
-            galleryItems.postValue(flickrFetcher.fetchPhotos(1))
-            Log.d(TAG, "getPhoto -> ${galleryItems.value}")
+    fun loadPhotos(text: String = ""): LiveData<List<GalleryItem>> {
+        viewModelScope.launch {
+            try {
+                val newPhoto = if (text.isBlank()) {
+                    flickrFetcher.fetchPhotos(page)
+                } else {
+                    flickrFetcher.searchPhotos(text)
+                }
+
+                if (page == 1) {
+                    _galleryItems.value = newPhoto
+                } else {
+                    _galleryItems.value = (_galleryItems.value ?: emptyList()) + newPhoto
+                }
+
+                page ++
+
+                Log.i(TAG, "photos -> ${_galleryItems.value}\n" +
+                        "page $page") // сюда сцену ошибки
+
+            } catch (e: Exception) {
+                Log.e(TAG, "🔴Filed to load photo")
+                throw e
+            }
         }
 
-        return galleryItems
+        return _galleryItems
     }
 
-    fun searchPhoto(text: String): LiveData<List<GalleryItem>> {
-        viewModelScope.launch(Dispatchers.IO) {
-            galleryItems.postValue(flickrFetcher.searchPhotos(text))
-            Log.d(TAG, "searchPhoto -> ${galleryItems.value}")
-        }
+    fun searchPhotos(text: String): LiveData<List<GalleryItem>> {
 
-        return galleryItems
+        page = 1
+        _galleryItems.value = emptyList()
+
+        return loadPhotos(text)
     }
 
     fun loadingState(state: (Boolean) -> Unit) {
