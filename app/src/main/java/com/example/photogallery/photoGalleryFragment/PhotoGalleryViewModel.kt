@@ -20,31 +20,15 @@ class PhotoGalleryViewModel @Inject constructor(
 ): ViewModel() {
 
     fun loadPhotos(): LiveData<PagingData<GalleryItem>> {
-        val config = PagingConfig(PAGE_SIZE)
-
-        val factory = PagingSourceFactory {
-            FlickrPagingSource { page ->
-                flickrFetcher.fetchPhotos(page)
-            }
+        return fetchPagingData { page ->
+            flickrFetcher.fetchPhotos(page)
         }
-
-        return Pager(config, pagingSourceFactory = factory)
-            .liveData
-            .cachedIn(viewModelScope)
     }
 
     fun searchPhotos(text: String): LiveData<PagingData<GalleryItem>> {
-        val config = PagingConfig(PAGE_SIZE)
-
-        val factory = PagingSourceFactory {
-            FlickrPagingSource {
-                flickrFetcher.searchPhotos(text)
-            }
+        return fetchPagingData {
+            flickrFetcher.searchPhotos(text)
         }
-
-        return Pager(config, pagingSourceFactory = factory)
-            .liveData
-            .cachedIn(viewModelScope)
     }
 
     fun loadingState(state: (Boolean) -> Unit) {
@@ -59,6 +43,23 @@ class PhotoGalleryViewModel @Inject constructor(
 
             }
         }
+    }
+
+    private fun fetchPagingData(
+        handler: suspend (Int) -> List<GalleryItem>
+    ): LiveData<PagingData<GalleryItem>> {
+
+        val config = PagingConfig(PAGE_SIZE)
+
+        val factory = PagingSourceFactory {
+            FlickrPagingSource { page ->
+                handler(page)
+            }
+        }
+
+        return Pager(config, pagingSourceFactory = factory)
+            .liveData
+            .cachedIn(viewModelScope)
     }
 
     companion object {
