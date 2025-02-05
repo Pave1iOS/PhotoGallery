@@ -32,18 +32,18 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
         return withContext(Dispatchers.IO) {
 
             isLoadingState.value = true
-            Log.i(TAG, "🟡load data is started")
+            Log.i(TAG, "🟡$MODULE_MANE load data is starting")
 
             try {
                 val response = executeRequest(request)
                 val galleryItems = response.galleryItems.filterNot { it.url.isBlank() }
                 Log.i(
-                    TAG, "🟢load data is finish\n" +
-                            "- photo list is received (${galleryItems.size} photos)"
+                    TAG, "🟢$MODULE_MANE load data is finish\n" +
+                            "・${galleryItems.size} images is loaded"
                 )
                 galleryItems
             } catch (e: Exception) {
-                Log.e(TAG, "🔴Filed to fetch photo", e)
+                Log.e(TAG, "🔴$MODULE_MANE filed to fetch photo", e)
                 throw e
             } finally {
                 isLoadingState.value = false
@@ -61,7 +61,7 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
                         continuation.resume(body)
                     } else {
                         continuation.resumeWithException(IllegalStateException(
-                            "🔴response body is null"
+                            "🔴$MODULE_MANE response body is null"
                         ))
                     }
 
@@ -75,6 +75,7 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
     }
 
     companion object {
+        private const val MODULE_MANE = "NETWORK ->"
         private const val TAG = "FlickrFetcher"
     }
 }

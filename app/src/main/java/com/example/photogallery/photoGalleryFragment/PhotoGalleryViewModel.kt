@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.example.photogallery.api.GalleryItem
 import com.example.photogallery.data.FlickrFetcher
@@ -37,11 +38,10 @@ class PhotoGalleryViewModel @Inject constructor(
 
                 page ++
 
-                Log.i(TAG, "photos -> ${_galleryItems.value}\n" +
-                        "page $page") // сюда сцену ошибки
+                Log.i(TAG, "🟢$MODULE_NAME upload is caused (page $page)")
 
             } catch (e: Exception) {
-                Log.e(TAG, "🔴Filed to load photo")
+                Log.e(TAG, "🔴$MODULE_NAME Filed to load photo")
                 throw e
             }
         }
@@ -72,6 +72,7 @@ class PhotoGalleryViewModel @Inject constructor(
     }
 
     companion object {
+        private const val MODULE_NAME = "VIEW MODEL ->"
         private const val TAG = "PhotoGalleryViewModel"
     }
 }

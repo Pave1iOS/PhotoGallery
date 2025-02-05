@@ -94,7 +94,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
-                    Log.i(TAG, "Search text: $query")
+                    Log.i(TAG, "🟢$MODULE_NAME called query search: $query")
 
                     viewModel.loadPhotos(query)
 
@@ -102,7 +102,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                 }
 
                 override fun onQueryTextChange(newText: String): Boolean {
-                    Log.d(TAG, "search query: $newText")
+                    Log.i(TAG, "🟢$MODULE_NAME called character search: $newText")
 
                     if (newText.isNotBlank()) {
                         viewModel.searchPhotos(newText)
@@ -184,6 +184,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     }
 
     companion object {
+        private const val MODULE_NAME = "FRAGMENT ->"
         private const val TAG = "PhotoGalleryFragment"
         fun newInstance(): PhotoGalleryFragment {
 
