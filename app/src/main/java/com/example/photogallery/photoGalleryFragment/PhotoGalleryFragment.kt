@@ -1,6 +1,5 @@
 package com.example.photogallery.photoGalleryFragment
 
-import android.icu.text.RelativeDateTimeFormatter.Direction
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +14,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
@@ -22,6 +22,8 @@ import com.bumptech.glide.Glide
 import com.example.photogallery.App
 import com.example.photogallery.R
 import com.example.photogallery.data.FlickrFetcher
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PhotoGalleryFragment: Fragment(), MenuProvider {
@@ -104,11 +106,24 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                 override fun onQueryTextChange(newText: String): Boolean {
                     Log.i(TAG, "🟢$MODULE_NAME called character search: $newText")
 
-                    if (newText.isNotBlank()) {
-                        viewModel.searchPhotos(newText)
-                    } else {
-                        viewModel.loadPhotos()
+                    viewModel.page = 1
+                    lifecycleScope.launch {
+
+                        delay(2000)
+
+                        if (newText == LAST_QUERY_TEXT) {
+
+                            if (newText.isNotBlank()) {
+                                viewModel.loadPhotos(newText)
+                            } else {
+                                viewModel.loadPhotos()
+                            }
+
+                        }
                     }
+
+                    LAST_QUERY_TEXT = newText
+                    Log.d(TAG, "LAST_QUERY_TEXT = $LAST_QUERY_TEXT")
 
                     return true
                 }
@@ -184,12 +199,12 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     }
 
     companion object {
+        var LAST_QUERY_TEXT = ""
         private const val MODULE_NAME = "FRAGMENT ->"
         private const val TAG = "PhotoGalleryFragment"
+
         fun newInstance(): PhotoGalleryFragment {
-
             return PhotoGalleryFragment()
-
         }
     }
 }

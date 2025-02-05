@@ -4,11 +4,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.example.photogallery.api.GalleryItem
 import com.example.photogallery.data.FlickrFetcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,14 +17,20 @@ class PhotoGalleryViewModel @Inject constructor(
     private var _galleryItems = MutableLiveData<List<GalleryItem>>()
     val galleryItems: LiveData<List<GalleryItem>> get() = _galleryItems
 
-    private var page = 1
+    var page = 0
 
     fun loadPhotos(text: String = ""): LiveData<List<GalleryItem>> {
+
+        page ++
+
         viewModelScope.launch {
             try {
+
                 val newPhoto = if (text.isBlank()) {
                     flickrFetcher.fetchPhotos(page)
                 } else {
+                    _galleryItems.value = emptyList()
+                    page = 1
                     flickrFetcher.searchPhotos(text)
                 }
 
@@ -36,7 +40,6 @@ class PhotoGalleryViewModel @Inject constructor(
                     _galleryItems.value = (_galleryItems.value ?: emptyList()) + newPhoto
                 }
 
-                page ++
 
                 Log.i(TAG, "🟢$MODULE_NAME upload is caused (page $page)")
 
@@ -47,14 +50,6 @@ class PhotoGalleryViewModel @Inject constructor(
         }
 
         return _galleryItems
-    }
-
-    fun searchPhotos(text: String): LiveData<List<GalleryItem>> {
-
-        page = 1
-        _galleryItems.value = emptyList()
-
-        return loadPhotos(text)
     }
 
     fun loadingState(state: (Boolean) -> Unit) {
