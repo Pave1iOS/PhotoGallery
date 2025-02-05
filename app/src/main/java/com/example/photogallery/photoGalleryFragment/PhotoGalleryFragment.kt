@@ -69,7 +69,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         loadPhotos()
 
         viewModel.loadingState {
-            playLoadAnimation(it)
+            loadAnimation(it)
         }
     }
 
@@ -154,23 +154,27 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         view.viewTreeObserver.addOnGlobalLayoutListener(listener)
     }
 
-    private fun playLoadAnimation(playAnimation: Boolean) {
+    private fun loadAnimation(play: Boolean) {
 
-        val visible = when(playAnimation) {
+        val visible = when(play) {
             true -> View.VISIBLE
             false -> View.GONE
         }
 
         gifImageView.visibility = visible
 
-        when(playAnimation) {
+        when(play) {
             true -> {
+                photoRecyclerView.alpha = 0.5f
+
                 Glide.with(this)
                     .asGif()
                     .load(R.drawable.full_scene_load_animation)
                     .into(gifImageView)
             }
             false -> {
+                photoRecyclerView.alpha = 1f
+
                 Glide.with(this).clear(gifImageView)
             }
         }
