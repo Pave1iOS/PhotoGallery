@@ -67,16 +67,17 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
 
         loadPhotos()
-
-        viewModel.loadingState {
-            loadAnimation(it)
-        }
     }
 
     override fun onStart() {
         super.onStart()
 
         calculateDynamicColumnWithRecyclerView(photoRecyclerView)
+
+        viewModel.loadingState {
+            if (isAdded)
+            loadAnimation(it)
+        }
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -167,7 +168,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
             true -> {
                 photoRecyclerView.alpha = 0.5f
 
-                Glide.with(this)
+                Glide.with(requireActivity())
                     .asGif()
                     .load(R.drawable.full_scene_load_animation)
                     .into(gifImageView)
@@ -175,7 +176,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
             false -> {
                 photoRecyclerView.alpha = 1f
 
-                Glide.with(this).clear(gifImageView)
+                Glide.with(requireActivity()).clear(gifImageView)
             }
         }
     }
