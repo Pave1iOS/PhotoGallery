@@ -5,8 +5,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSourceFactory
+import androidx.paging.cachedIn
+import androidx.paging.liveData
 import com.example.photogallery.api.GalleryItem
 import com.example.photogallery.data.FlickrFetcher
+import com.example.photogallery.data.FlickrPagingSource
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -14,42 +21,32 @@ class PhotoGalleryViewModel @Inject constructor(
     private val flickrFetcher: FlickrFetcher
 ): ViewModel() {
 
-    private var _galleryItems = MutableLiveData<List<GalleryItem>>()
-    val galleryItems: LiveData<List<GalleryItem>> get() = _galleryItems
+    fun loadPhotos(): LiveData<PagingData<GalleryItem>> {
+        val config = PagingConfig(PAGE_SIZE)
 
-    var page = 0
-
-    fun loadPhotos(text: String = ""): LiveData<List<GalleryItem>> {
-
-        page ++
-
-        viewModelScope.launch {
-            try {
-
-                val newPhoto = if (text.isBlank()) {
-                    flickrFetcher.fetchPhotos(page)
-                } else {
-                    _galleryItems.value = emptyList()
-                    page = 1
-                    flickrFetcher.searchPhotos(text)
-                }
-
-                if (page == 1) {
-                    _galleryItems.value = newPhoto
-                } else {
-                    _galleryItems.value = (_galleryItems.value ?: emptyList()) + newPhoto
-                }
-
-
-                Log.i(TAG, "🟢$MODULE_NAME upload is caused (page $page)")
-
-            } catch (e: Exception) {
-                Log.e(TAG, "🔴$MODULE_NAME Filed to load photo")
-                throw e
+        val factory = PagingSourceFactory {
+            FlickrPagingSource { page ->
+                flickrFetcher.fetchPhotos(page)
             }
         }
 
-        return _galleryItems
+        return Pager(config, pagingSourceFactory = factory)
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    fun searchPhotos(text: String): LiveData<PagingData<GalleryItem>> {
+        val config = PagingConfig(PAGE_SIZE)
+
+        val factory = PagingSourceFactory {
+            FlickrPagingSource {
+                flickrFetcher.searchPhotos(text)
+            }
+        }
+
+        return Pager(config, pagingSourceFactory = factory)
+            .liveData
+            .cachedIn(viewModelScope)
     }
 
     fun loadingState(state: (Boolean) -> Unit) {
@@ -67,6 +64,7 @@ class PhotoGalleryViewModel @Inject constructor(
     }
 
     companion object {
+        private const val PAGE_SIZE = 100
         private const val MODULE_NAME = "VIEW MODEL ->"
         private const val TAG = "PhotoGalleryViewModel"
     }

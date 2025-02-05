@@ -17,7 +17,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.bumptech.glide.Glide
 import com.example.photogallery.App
 import com.example.photogallery.R
@@ -53,8 +52,6 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         photoRecyclerView.adapter = adapter
 
-        recyclerViewScrollListener(photoRecyclerView)
-
         return view
     }
 
@@ -69,11 +66,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
 
-        viewModel.galleryItems.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-        }
-
-        viewModel.loadPhotos()
+        loadPhotos()
 
         viewModel.loadingState {
             playLoadAnimation(it)
@@ -93,46 +86,43 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         val searchView = menuSearch.actionView as SearchView
 
         searchView.apply {
-
-            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String): Boolean {
-                    Log.i(TAG, "🟢$MODULE_NAME called query search: $query")
-
-                    viewModel.loadPhotos(query)
-
-                    return true
-                }
-
-                override fun onQueryTextChange(newText: String): Boolean {
-                    Log.i(TAG, "🟢$MODULE_NAME called character search: $newText")
-
-                    viewModel.page = 1
-                    lifecycleScope.launch {
-
-                        delay(2000)
-
-                        if (newText == LAST_QUERY_TEXT) {
-
-                            if (newText.isNotBlank()) {
-                                viewModel.loadPhotos(newText)
-                            } else {
-                                viewModel.loadPhotos()
-                            }
-
-                        }
-                    }
-
-                    LAST_QUERY_TEXT = newText
-                    Log.d(TAG, "LAST_QUERY_TEXT = $LAST_QUERY_TEXT")
-
-                    return true
-                }
-            })
+            queryTextListener(this)
         }
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return true
+    }
+
+    private fun queryTextListener(searchView: SearchView) {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                Log.i(TAG, "🟢$MODULE_NAME called query search: $query")
+                searchPhotos(query)
+
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                Log.i(TAG, "🟢$MODULE_NAME called character search: $newText")
+
+                lifecycleScope.launch {
+                    delay(2000)
+
+                    if (newText == LAST_QUERY_TEXT)
+
+                        if (newText.isNotBlank()) {
+                            searchPhotos(newText)
+                        } else {
+                            loadPhotos()
+                        }
+                }
+
+                LAST_QUERY_TEXT = newText
+
+                return true
+            }
+        })
     }
 
     private fun calculateDynamicColumnWithRecyclerView(view: RecyclerView) {
@@ -186,16 +176,20 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         }
     }
 
-    private fun recyclerViewScrollListener(recyclerView: RecyclerView) {
-        recyclerView.addOnScrollListener(object : OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                if (!recyclerView.canScrollVertically(1)) {
-                    viewModel.loadPhotos()
-                }
+    private fun loadPhotos() {
+        viewModel.loadPhotos().observe(viewLifecycleOwner) {
+            lifecycleScope.launch {
+                adapter.submitData(it)
             }
-        })
+        }
+    }
+
+    private fun searchPhotos(text: String) {
+        viewModel.searchPhotos(text).observe(viewLifecycleOwner) {
+            lifecycleScope.launch {
+                adapter.submitData(it)
+            }
+        }
     }
 
     companion object {

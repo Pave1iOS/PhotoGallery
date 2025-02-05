@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,13 +14,14 @@ import com.squareup.picasso.Picasso
 
 class PhotoGalleryAdapter(
     private val layoutInflater: LayoutInflater
-): ListAdapter<GalleryItem, PhotoGalleryAdapter.PhotoGalleryViewHolder>(COMPARATOR) {
+): PagingDataAdapter<GalleryItem, PhotoGalleryAdapter.PhotoGalleryViewHolder>(COMPARATOR) {
 
     override fun onBindViewHolder(holder: PhotoGalleryViewHolder, position: Int) {
 
-        val item = getItem(position)
+        getItem(position)?.let {
+            holder.bind(it)
+        }
 
-        holder.bind(item)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoGalleryViewHolder {
