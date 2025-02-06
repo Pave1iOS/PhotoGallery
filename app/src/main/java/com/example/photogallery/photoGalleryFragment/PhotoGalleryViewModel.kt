@@ -33,7 +33,7 @@ class PhotoGalleryViewModel @Inject constructor(
             }
         }
 
-        Log.i(TAG, "$MODULE_NAME load photo progress = $progress")
+        Log.i(TAG, "🟢$MODULE_NAME load photo progress = ${progress.value}")
 
         return _currentPhotos
             ?: fetchPagingData {  page ->
