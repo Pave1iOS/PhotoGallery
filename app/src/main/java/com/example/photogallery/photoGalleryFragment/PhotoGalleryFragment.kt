@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.Button
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -71,10 +72,9 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         calculateDynamicColumnWithRecyclerView(binding.photoRecyclerView)
 
-        viewModel.loadingState {
-            if (isAdded)
-            loadAnimation(it)
-        }
+        loadingState()
+        networkState()
+        buttonNetworkReloadListener(binding.tryAgainButton)
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -178,6 +178,16 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         }
     }
 
+    private fun showErrorNetworkMessage(status: Boolean) {
+
+        val visible = when(status) {
+            true -> View.GONE
+            false -> View.VISIBLE
+        }
+
+        binding.errorDataNull.visibility = visible
+    }
+
     private fun loadPhotos() {
         viewModel.loadPhotos().observe(viewLifecycleOwner) {
             lifecycleScope.launch {
@@ -191,6 +201,26 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
             lifecycleScope.launch {
                 adapter.submitData(it)
             }
+        }
+    }
+
+    private fun loadingState() {
+        viewModel.loadingState {
+            if (isAdded)
+                loadAnimation(it)
+        }
+    }
+
+    private fun networkState() {
+        viewModel.networkState {
+            if (isAdded)
+                showErrorNetworkMessage(it)
+        }
+    }
+
+    private fun buttonNetworkReloadListener(button: Button) {
+        button.setOnClickListener {
+            loadPhotos()
         }
     }
 

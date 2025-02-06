@@ -18,6 +18,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
+    var isNetworkState = MutableStateFlow(true)
     var isLoadingState = MutableStateFlow(true)
 
     suspend fun fetchPhotos(page: Int): List<GalleryItem> {
@@ -31,7 +32,9 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
     private suspend fun fetchPhotoMetadata(request: () -> Call<FlickrResponse>): List<GalleryItem> {
         return withContext(Dispatchers.IO) {
 
+            isNetworkState.value = true
             isLoadingState.value = true
+
             Log.i(TAG, "🟡$MODULE_MANE load data is starting")
 
             try {
@@ -44,6 +47,7 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
                 galleryItems
             } catch (e: Exception) {
                 Log.e(TAG, "🔴$MODULE_MANE filed to fetch photo", e)
+                isNetworkState.value = false
                 throw e
             } finally {
                 isLoadingState.value = false
@@ -60,11 +64,11 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
                     if (body != null) {
                         continuation.resume(body)
                     } else {
+                        isNetworkState.value = false
                         continuation.resumeWithException(IllegalStateException(
                             "🔴$MODULE_MANE response body is null"
                         ))
                     }
-
                 }
 
                 override fun onFailure(p0: Call<FlickrResponse>, p1: Throwable) {

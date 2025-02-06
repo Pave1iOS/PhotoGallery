@@ -60,6 +60,14 @@ class PhotoGalleryViewModel @Inject constructor(
         }
     }
 
+    fun networkState(state: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            flickrFetcher.isNetworkState.collect {
+                if (it) state(true) else state(false)
+            }
+        }
+    }
+
     private fun fetchPagingData(
         handler: suspend (Int) -> List<GalleryItem>
     ): LiveData<PagingData<GalleryItem>> {
