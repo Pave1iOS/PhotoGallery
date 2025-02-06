@@ -1,6 +1,8 @@
 package com.example.photogallery.photoGalleryFragment
 
+import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -19,13 +21,32 @@ class PhotoGalleryViewModel @Inject constructor(
     private val flickrFetcher: FlickrFetcher
 ): ViewModel() {
 
+    private var _currentPhotos: LiveData<PagingData<GalleryItem>>? = null
+    private var progress = MutableLiveData(0)
+
     fun loadPhotos(): LiveData<PagingData<GalleryItem>> {
-        return fetchPagingData { page ->
-            flickrFetcher.fetchPhotos(page)
+
+        if (progress.value == 0) {
+            _currentPhotos = fetchPagingData { page ->
+                progress.value = page
+                flickrFetcher.fetchPhotos(page)
+            }
         }
+
+        Log.i(TAG, "$MODULE_NAME load photo progress = $progress")
+
+        return _currentPhotos
+            ?: fetchPagingData {  page ->
+                flickrFetcher.fetchPhotos(page)
+            }
     }
 
+
     fun searchPhotos(text: String): LiveData<PagingData<GalleryItem>> {
+        progress.value = 0
+
+        Log.i(TAG, "$MODULE_NAME search photo progress = $progress")
+
         return fetchPagingData {
             flickrFetcher.searchPhotos(text)
         }
@@ -34,13 +55,7 @@ class PhotoGalleryViewModel @Inject constructor(
     fun loadingState(state: (Boolean) -> Unit) {
         viewModelScope.launch {
             flickrFetcher.isLoadingState.collect {
-
-                if (it) {
-                    state(true)
-                } else {
-                    state(false)
-                }
-
+                if (it) state(true) else state(false)
             }
         }
     }
