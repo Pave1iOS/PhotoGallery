@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -21,6 +20,7 @@ import com.bumptech.glide.Glide
 import com.example.photogallery.App
 import com.example.photogallery.R
 import com.example.photogallery.data.FlickrFetcher
+import com.example.photogallery.databinding.FragmentPhotoGalleryBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,25 +34,22 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         ViewModelProvider(this, viewModelFactory)[PhotoGalleryViewModel::class.java]
     }
 
-    private lateinit var photoRecyclerView: RecyclerView
     private lateinit var adapter: PhotoGalleryAdapter
-    private lateinit var gifImageView: ImageView
+    private lateinit var binding: FragmentPhotoGalleryBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_photo_gallery, container,false)
-        gifImageView = view.findViewById(R.id.load_animation)
+    ): View {
 
-        photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
+        binding = FragmentPhotoGalleryBinding.inflate(inflater, container, false)
 
         adapter = PhotoGalleryAdapter(inflater)
 
-        photoRecyclerView.adapter = adapter
+        binding.photoRecyclerView.adapter = adapter
 
-        return view
+        return binding.root
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +69,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     override fun onStart() {
         super.onStart()
 
-        calculateDynamicColumnWithRecyclerView(photoRecyclerView)
+        calculateDynamicColumnWithRecyclerView(binding.photoRecyclerView)
 
         viewModel.loadingState {
             if (isAdded)
@@ -162,21 +159,21 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
             false -> View.GONE
         }
 
-        gifImageView.visibility = visible
+        binding.loadAnimation.visibility = visible
 
         when(play) {
             true -> {
-                photoRecyclerView.alpha = 0.5f
+                binding.photoRecyclerView.alpha = 0.5f
 
                 Glide.with(requireActivity())
                     .asGif()
                     .load(R.drawable.full_scene_load_animation)
-                    .into(gifImageView)
+                    .into(binding.loadAnimation)
             }
             false -> {
-                photoRecyclerView.alpha = 1f
+                binding.photoRecyclerView.alpha = 1f
 
-                Glide.with(requireActivity()).clear(gifImageView)
+                Glide.with(requireActivity()).clear(binding.loadAnimation)
             }
         }
     }
