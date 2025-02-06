@@ -3,5 +3,6 @@
     <string name="imageContentDescr">Image</string>
     <string name="search">Search</string>
     <string name="search_clear">Clear</string>
-    <string name="warning_massage_data_null">Sorry, temporary problems.\nTry it again later</string>
+    <string name="warning_massage_data_null">Sorry, temporary problems.\nTry it again later.</string>
+    <string name="try_again_button">try again</string>
 </resources>

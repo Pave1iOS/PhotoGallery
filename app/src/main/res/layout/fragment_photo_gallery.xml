@@ -27,8 +27,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
 
         tools:visibility="visible"
-        tools:src="@drawable/full_scene_load_animation"
-        />
+        tools:src="@drawable/full_scene_load_animation"/>
 
     <!--текст и изображение ошибки загрузки изодражений-->
     <LinearLayout
@@ -61,7 +60,15 @@
             android:layout_height="150dp"
             android:src="@drawable/error_data_null_smile"
             android:layout_gravity="center"
-            android:contentDescription="@string/imageContentDescr" />
+            android:contentDescription="@string/imageContentDescr"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/try_again_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/try_again_button"/>
 
     </LinearLayout>
 
