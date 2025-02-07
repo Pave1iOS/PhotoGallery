@@ -106,7 +106,7 @@ class PhotoGalleryViewModel @Inject constructor(
 
     private fun loadStoredQuery() {
         viewModelScope.launch {
-            FlickrDataStore.getStoredQuery(app).collectLatest { query ->
+            FlickrDataStore.getStoredQuery(app).collect { query ->
                 _storedQuery.value = query
 
                 Log.i(TAG, "$MODULE_NAME loadStoredQuery = $query")
