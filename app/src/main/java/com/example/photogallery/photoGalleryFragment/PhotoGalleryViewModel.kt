@@ -17,6 +17,7 @@ import com.example.photogallery.data.FlickrDataStore
 import com.example.photogallery.data.FlickrFetcher
 import com.example.photogallery.data.FlickrPagingSource
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,13 +43,13 @@ class PhotoGalleryViewModel @Inject constructor(
 
     fun loadPhotos(): LiveData<PagingData<GalleryItem>> {
 
-        if (progress.value == 0) {
+        if (_currentPhotos == null || progress.value == 0) {
             _currentPhotos = fetchPagingData { page ->
                 progress.value = page
                 flickrFetcher.fetchPhotos(page)
             }
         }
-
+        Log.d(TAG, "load photo checked")
         Log.i(TAG, "🟢$MODULE_NAME load photo progress = ${progress.value}")
 
         return _currentPhotos
@@ -67,6 +68,7 @@ class PhotoGalleryViewModel @Inject constructor(
         progress.value = 0
 
         Log.i(TAG, "$MODULE_NAME search photo progress = ${progress.value}")
+        Log.d(TAG, "search photo checked")
 
         return fetchPagingData {
             flickrFetcher.searchPhotos(text)
@@ -104,14 +106,10 @@ class PhotoGalleryViewModel @Inject constructor(
 
     private fun loadStoredQuery() {
         viewModelScope.launch {
-            FlickrDataStore.getStoredQuery(app).collect { query ->
+            FlickrDataStore.getStoredQuery(app).collectLatest { query ->
                 _storedQuery.value = query
 
                 Log.i(TAG, "$MODULE_NAME loadStoredQuery = $query")
-
-                query?.let {
-                    searchPhotos(it)
-                }
             }
         }
     }
