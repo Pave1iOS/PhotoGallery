@@ -3,6 +3,7 @@ package com.example.photogallery.photoGalleryFragment
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -88,9 +89,9 @@ class PhotoGalleryViewModel @Inject constructor(
         }
     }
 
-    fun queryCheck(handler: (String) -> Unit) {
+    fun queryCheck(lifecycleOwner: LifecycleOwner, handler: (String) -> Unit) {
 
-        _storedQuery.observeForever { query ->
+        _storedQuery.observe(lifecycleOwner) { query ->
             handler(query ?: "")
             Log.i(TAG, "$MODULE_NAME queryCheck = $query")
         }
