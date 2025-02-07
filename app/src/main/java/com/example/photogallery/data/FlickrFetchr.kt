@@ -7,7 +7,6 @@ import com.example.photogallery.api.GalleryItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
-import okhttp3.Request
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -39,7 +38,12 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
 
             try {
                 val response = executeRequest(request)
-                val galleryItems = response.galleryItems.filterNot { it.url.isBlank() }
+                val uniqueURL = mutableSetOf<String>()
+
+                val galleryItems = response.galleryItems.filterNot {
+                    it.url.isBlank() || !uniqueURL.add(it.url)
+                }
+
                 Log.i(
                     TAG, "🟢$MODULE_MANE load data is finish\n" +
                             "・${galleryItems.size} images is loaded"
