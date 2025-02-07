@@ -38,9 +38,18 @@ class PhotoGalleryViewModel @Inject constructor(
 
     private var _storedQuery = MutableStateFlow<String?>("")
 
+    var loadingData = MutableLiveData<PagingData<GalleryItem>>()
+
     init {
         Log.d(TAG, "$MODULE_NAME initialize")
-        loadStoredQuery()
+
+        initializeData()
+
+//        loadStoredQuery()
+    }
+
+    fun initializeData() {
+
     }
 
     fun loadPhotos(): LiveData<PagingData<GalleryItem>> {

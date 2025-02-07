@@ -69,6 +69,13 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
 
+        viewModel.loadingData.observe(viewLifecycleOwner) { data ->
+            lifecycleScope.launch {
+                Log.d(TAG, "$MODULE_NAME data: $data")
+                adapter.submitData(data)
+            }
+        }
+
 
 
 //        loadPhotos()
