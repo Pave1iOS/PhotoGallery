@@ -13,14 +13,16 @@ import android.widget.Button
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.photogallery.App
 import com.example.photogallery.R
-import com.example.photogallery.data.FlickrFetcher
+import com.example.photogallery.api.GalleryItem
 import com.example.photogallery.databinding.FragmentPhotoGalleryBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -28,7 +30,6 @@ import javax.inject.Inject
 
 class PhotoGalleryFragment: Fragment(), MenuProvider {
 
-    @Inject lateinit var flickrFetcher: FlickrFetcher
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel by lazy {
@@ -201,11 +202,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
             Log.i(TAG, "$MODULE_NAME last query = $lastQuery")
 
             if (lastQuery.isBlank()) {
-                viewModel.loadPhotos().observe(viewLifecycleOwner) {
-                    lifecycleScope.launch {
-                        adapter.submitData(it)
-                    }
-                }
+                observe(viewModel.loadPhotos())
             } else {
                 searchPhotos(lastQuery)
             }
@@ -213,7 +210,11 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     }
 
     private fun searchPhotos(text: String) {
-        viewModel.searchPhotos(text).observe(viewLifecycleOwner) {
+        observe(viewModel.searchPhotos(text))
+    }
+
+    private fun observe(method: LiveData<PagingData<GalleryItem>>) {
+        method.observe(viewLifecycleOwner) {
             lifecycleScope.launch {
                 adapter.submitData(it)
             }
