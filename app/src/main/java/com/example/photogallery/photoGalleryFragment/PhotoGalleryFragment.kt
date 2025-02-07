@@ -91,7 +91,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return when(menuItem.itemId) {
             R.id.menu_item_clear -> {
-                searchPhotos("popular") // изменить
+                viewModel.clearStoredQuery()
                 true
             }
             else -> super.onContextItemSelected(menuItem)

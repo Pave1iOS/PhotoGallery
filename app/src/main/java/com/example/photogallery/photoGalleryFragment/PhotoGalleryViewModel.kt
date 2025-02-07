@@ -99,6 +99,10 @@ class PhotoGalleryViewModel @Inject constructor(
         }
     }
 
+    fun clearStoredQuery() {
+        _storedQuery.value = ""
+    }
+
     private fun loadStoredQuery() {
         viewModelScope.launch {
             FlickrDataStore.getStoredQuery(app).collect { query ->
