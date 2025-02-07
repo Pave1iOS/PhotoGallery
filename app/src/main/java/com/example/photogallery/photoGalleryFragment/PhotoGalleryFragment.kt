@@ -196,7 +196,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
     private fun loadPhotos() {
 
-        viewModel.queryCheck(viewLifecycleOwner) { lastQuery ->
+        viewModel.queryCheck { lastQuery ->
 
             Log.i(TAG, "$MODULE_NAME last query = $lastQuery")
 

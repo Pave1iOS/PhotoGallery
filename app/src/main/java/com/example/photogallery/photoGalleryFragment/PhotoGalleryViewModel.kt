@@ -17,6 +17,7 @@ import com.example.photogallery.api.GalleryItem
 import com.example.photogallery.data.FlickrDataStore
 import com.example.photogallery.data.FlickrFetcher
 import com.example.photogallery.data.FlickrPagingSource
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,7 +35,7 @@ class PhotoGalleryViewModel @Inject constructor(
     private var _currentPhotos: LiveData<PagingData<GalleryItem>>? = null
     private var progress = MutableLiveData(0)
 
-    private var _storedQuery = MutableLiveData<String?>()
+    private var _storedQuery = MutableStateFlow<String?>("")
 
     init {
         loadStoredQuery()
@@ -89,11 +90,12 @@ class PhotoGalleryViewModel @Inject constructor(
         }
     }
 
-    fun queryCheck(lifecycleOwner: LifecycleOwner, handler: (String) -> Unit) {
-
-        _storedQuery.observe(lifecycleOwner) { query ->
-            handler(query ?: "")
-            Log.i(TAG, "$MODULE_NAME queryCheck = $query")
+    fun queryCheck(handler: (String) -> Unit) {
+        viewModelScope.launch {
+            _storedQuery.collect { query ->
+                handler(query ?: "")
+                Log.i(TAG, "$MODULE_NAME queryCheck = $query")
+            }
         }
     }
 
