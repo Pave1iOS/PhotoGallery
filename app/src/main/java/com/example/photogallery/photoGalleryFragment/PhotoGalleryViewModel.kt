@@ -75,19 +75,11 @@ class PhotoGalleryViewModel @Inject constructor(
     }
 
     fun loadingState(state: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            flickrFetcher.isLoadingState.collect {
-                if (it) state(true) else state(false)
-            }
-        }
+        observeState(flickrFetcher.isLoadingState, state)
     }
 
     fun networkState(state: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            flickrFetcher.isNetworkState.collect {
-                if (it) state(true) else state(false)
-            }
-        }
+        observeState(flickrFetcher.isNetworkState, state)
     }
 
     fun queryCheck(handler: (String) -> Unit) {
@@ -101,6 +93,14 @@ class PhotoGalleryViewModel @Inject constructor(
 
     fun clearStoredQuery() {
         _storedQuery.value = ""
+    }
+
+    private fun observeState(flow: MutableStateFlow<Boolean>, state: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            flow.collect {
+                if (it) state(true) else state(false)
+            }
+        }
     }
 
     private fun loadStoredQuery() {
