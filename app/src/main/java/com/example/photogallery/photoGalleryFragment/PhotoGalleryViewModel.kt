@@ -1,9 +1,10 @@
 package com.example.photogallery.photoGalleryFragment
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -12,17 +13,31 @@ import androidx.paging.PagingSourceFactory
 import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.example.photogallery.api.GalleryItem
+import com.example.photogallery.data.FlickrDataStore
 import com.example.photogallery.data.FlickrFetcher
 import com.example.photogallery.data.FlickrPagingSource
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * @property _currentPhotos для сохранения прогресса RecyclerView
+ * @property progress для сохранения прогресса RecyclerView
+ * @property _storedQuery для сохранения запроса при перезапуске приложения
+ */
+
 class PhotoGalleryViewModel @Inject constructor(
-    private val flickrFetcher: FlickrFetcher
-): ViewModel() {
+    private val flickrFetcher: FlickrFetcher,
+    private val app: Application
+): AndroidViewModel(app) {
 
     private var _currentPhotos: LiveData<PagingData<GalleryItem>>? = null
     private var progress = MutableLiveData(0)
+
+    private var _storedQuery = MutableLiveData<String?>()
+
+    init {
+        loadStoredQuery()
+    }
 
     fun loadPhotos(): LiveData<PagingData<GalleryItem>> {
 
@@ -43,9 +58,14 @@ class PhotoGalleryViewModel @Inject constructor(
 
 
     fun searchPhotos(text: String): LiveData<PagingData<GalleryItem>> {
+
+        viewModelScope.launch {
+            FlickrDataStore.setStoredQuery(app, text)
+        }
+
         progress.value = 0
 
-        Log.i(TAG, "$MODULE_NAME search photo progress = $progress")
+        Log.i(TAG, "$MODULE_NAME search photo progress = ${progress.value}")
 
         return fetchPagingData {
             flickrFetcher.searchPhotos(text)
@@ -64,6 +84,28 @@ class PhotoGalleryViewModel @Inject constructor(
         viewModelScope.launch {
             flickrFetcher.isNetworkState.collect {
                 if (it) state(true) else state(false)
+            }
+        }
+    }
+
+    fun queryCheck(handler: (String) -> Unit) {
+
+        _storedQuery.observeForever { query ->
+            handler(query ?: "")
+            Log.i(TAG, "$MODULE_NAME queryCheck = $query")
+        }
+    }
+
+    private fun loadStoredQuery() {
+        viewModelScope.launch {
+            FlickrDataStore.getStoredQuery(app).collect { query ->
+                _storedQuery.value = query
+
+                Log.i(TAG, "$MODULE_NAME loadStoredQuery = $query")
+
+                query?.let {
+                    searchPhotos(it)
+                }
             }
         }
     }

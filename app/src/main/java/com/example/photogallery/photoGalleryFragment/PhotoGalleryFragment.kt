@@ -89,7 +89,13 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-        return true
+        return when(menuItem.itemId) {
+            R.id.menu_item_clear -> {
+                searchPhotos("popular") // изменить
+                true
+            }
+            else -> super.onContextItemSelected(menuItem)
+        }
     }
 
     private fun queryTextListener(searchView: SearchView) {
@@ -189,9 +195,19 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     }
 
     private fun loadPhotos() {
-        viewModel.loadPhotos().observe(viewLifecycleOwner) {
-            lifecycleScope.launch {
-                adapter.submitData(it)
+
+        viewModel.queryCheck { lastQuery ->
+
+            Log.i(TAG, "$MODULE_NAME last query = $lastQuery")
+
+            if (lastQuery.isBlank()) {
+                viewModel.loadPhotos().observe(viewLifecycleOwner) {
+                    lifecycleScope.launch {
+                        adapter.submitData(it)
+                    }
+                }
+            } else {
+                searchPhotos(lastQuery)
             }
         }
     }
