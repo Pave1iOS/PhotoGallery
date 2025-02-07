@@ -16,6 +16,7 @@ import com.example.photogallery.api.GalleryItem
 import com.example.photogallery.data.FlickrDataStore
 import com.example.photogallery.data.FlickrFetcher
 import com.example.photogallery.data.FlickrPagingSource
+import com.example.photogallery.photoGalleryFragment.PhotoGalleryFragment.Companion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -38,6 +39,7 @@ class PhotoGalleryViewModel @Inject constructor(
     private var _storedQuery = MutableStateFlow<String?>("")
 
     init {
+        Log.d(TAG, "$MODULE_NAME initialize")
         loadStoredQuery()
     }
 

@@ -39,6 +39,10 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     private lateinit var adapter: PhotoGalleryAdapter
     private lateinit var binding: FragmentPhotoGalleryBinding
 
+    init {
+        Log.d(TAG, "$MODULE_NAME initialize")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -65,7 +69,9 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
 
-        loadPhotos()
+
+
+//        loadPhotos()
     }
 
     override fun onStart() {
