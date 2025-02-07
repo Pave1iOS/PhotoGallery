@@ -42,6 +42,7 @@ android {
 
 dependencies {
 
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.picasso)
     implementation(libs.androidx.paging.runtime)
