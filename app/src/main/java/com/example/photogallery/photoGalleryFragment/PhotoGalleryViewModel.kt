@@ -73,11 +73,7 @@ class PhotoGalleryViewModel @Inject constructor(
     }
 
     fun clearStoredQuery() {
-        _storedQuery.value = ""
-
-        viewModelScope.launch {
-            FlickrDataStore.setStoredQuery(app, "")
-        }
+        saveStorageQuery("")
 
         Log.d(TAG, "clear stored query: ${_storedQuery.value}")
     }
@@ -102,9 +98,7 @@ class PhotoGalleryViewModel @Inject constructor(
 
     private fun searchPhotosFlow(text: String): Flow<PagingData<GalleryItem>> {
 
-        viewModelScope.launch {
-            FlickrDataStore.setStoredQuery(app, text)
-        }
+        saveStorageQuery(text)
 
         progress.value = 0
 
@@ -129,6 +123,12 @@ class PhotoGalleryViewModel @Inject constructor(
             flow.collect {
                 if (it) state(true) else state(false)
             }
+        }
+    }
+
+    private fun saveStorageQuery(text: String) {
+        viewModelScope.launch {
+            FlickrDataStore.setStoredQuery(app, text)
         }
     }
 
