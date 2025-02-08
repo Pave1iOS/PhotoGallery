@@ -37,7 +37,6 @@ class PhotoGalleryViewModel @Inject constructor(
     private var _savedLoadPhotos: Flow<PagingData<GalleryItem>>? = null
     private var _savedFindPhotos: Flow<PagingData<GalleryItem>>? = null
 
-    private var progress = MutableLiveData(0)
     private var _storedQuery = MutableStateFlow<String?>(null)
 
     fun initializeData() {
@@ -76,18 +75,16 @@ class PhotoGalleryViewModel @Inject constructor(
 
     fun clearStoredQuery() {
         saveStorageQuery("")
-        progress.value = 0
 
         Log.d(TAG, "clear stored query")
     }
 
     private fun loadPhotosFlow(): Flow<PagingData<GalleryItem>> {
 
-        Log.i(TAG, "🟢$MODULE_NAME load photo checked (progress = ${progress.value})")
+        Log.i(TAG, "🟢$MODULE_NAME load photo init")
 
         return _savedLoadPhotos
             ?: fetchPagingData { page ->
-                progress.value = page
                 Log.d(TAG, "current page: $page")
 
                 flickrFetcher.fetchPhotos(page)
@@ -98,11 +95,10 @@ class PhotoGalleryViewModel @Inject constructor(
 
         saveStorageQuery(text)
 
-        Log.i(TAG, "$MODULE_NAME search photo checked (progress: ${progress.value} page)")
+        Log.i(TAG, "$MODULE_NAME search photo init")
 
         return _savedFindPhotos
             ?: fetchPagingData { page ->
-                progress.value = page
                 Log.d(TAG, "current page: $page")
 
                 flickrFetcher.searchPhotos(text, page)
