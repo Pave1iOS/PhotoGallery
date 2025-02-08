@@ -46,6 +46,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.picasso)
     implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.common.android)
 
     kapt(libs.dagger.compiler)
     implementation(libs.dagger)
