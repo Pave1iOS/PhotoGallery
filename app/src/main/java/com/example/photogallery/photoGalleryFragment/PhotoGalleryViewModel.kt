@@ -46,18 +46,22 @@ class PhotoGalleryViewModel @Inject constructor(
             Log.d(TAG, "$MODULE_NAME stored query after initialize: ${_storedQuery.value}")
 
             if (_storedQuery.value.isNullOrBlank()) {
-                observe(loadPhotos())
+                observe(loadPhotoFlow())
             } else {
                 _storedQuery.value?.let { storedQuery ->
-                    observe(searchPhotos(storedQuery))
+                    observe(searchPhotosFlow(storedQuery))
                 }
             }
         }
     }
 
-    fun searchByPhoto(text: String) {
+    fun searchItems(text: String) {
         loadingData.value = PagingData.empty()
-        observe(searchPhotos(text))
+        observe(searchPhotosFlow(text))
+    }
+
+    fun loadingItems() {
+        observe(loadPhotoFlow())
     }
 
     fun loadingState(state: (Boolean) -> Unit) {
@@ -72,7 +76,7 @@ class PhotoGalleryViewModel @Inject constructor(
         _storedQuery.value = ""
     }
 
-    private fun loadPhotos(): Flow<PagingData<GalleryItem>> {
+    private fun loadPhotoFlow(): Flow<PagingData<GalleryItem>> {
 
         if (_currentPhotos == null || progress.value == 0) {
             _currentPhotos = fetchPagingData { page ->
@@ -80,6 +84,7 @@ class PhotoGalleryViewModel @Inject constructor(
                 flickrFetcher.fetchPhotos(page)
             }
         }
+
         Log.d(TAG, "load photo checked")
         Log.i(TAG, "🟢$MODULE_NAME load photo progress = ${progress.value}")
 
@@ -89,7 +94,7 @@ class PhotoGalleryViewModel @Inject constructor(
             }
     }
 
-    private fun searchPhotos(text: String): Flow<PagingData<GalleryItem>> {
+    private fun searchPhotosFlow(text: String): Flow<PagingData<GalleryItem>> {
 
         viewModelScope.launch {
             FlickrDataStore.setStoredQuery(app, text)

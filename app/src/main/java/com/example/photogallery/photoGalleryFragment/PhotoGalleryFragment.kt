@@ -13,16 +13,13 @@ import android.widget.Button
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.photogallery.App
 import com.example.photogallery.R
-import com.example.photogallery.api.GalleryItem
 import com.example.photogallery.databinding.FragmentPhotoGalleryBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -71,7 +68,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         viewModel.initializeData()
 
-        loadPhotos()
+        loadDate()
     }
 
     override fun onStart() {
@@ -99,7 +96,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         return when(menuItem.itemId) {
             R.id.menu_item_clear -> {
                 viewModel.clearStoredQuery()
-                loadPhotos()
+                loadPhoto()
                 true
             }
             else -> super.onContextItemSelected(menuItem)
@@ -126,7 +123,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                         if (newText.isNotBlank()) {
                             searchPhotos(newText)
                         } else {
-                            loadPhotos()
+                            loadPhoto()
                         }
                 }
 
@@ -202,7 +199,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         binding.errorDataNull.visibility = visible
     }
 
-    private fun loadPhotos() {
+    private fun loadDate() {
         viewModel.loadingData.observe(viewLifecycleOwner) { data ->
             lifecycleScope.launch {
                 Log.d(TAG, "$MODULE_NAME data: $data")
@@ -211,8 +208,12 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         }
     }
 
+    private fun loadPhoto() {
+        viewModel.loadingItems()
+    }
+
     private fun searchPhotos(text: String) {
-        viewModel.searchByPhoto(text)
+        viewModel.searchItems(text)
     }
 
     private fun loadingState() {
@@ -231,7 +232,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
     private fun buttonNetworkReloadListener(button: Button) {
         button.setOnClickListener {
-            loadPhotos()
+            loadDate()
         }
     }
 
