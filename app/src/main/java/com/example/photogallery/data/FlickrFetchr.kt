@@ -21,11 +21,11 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
     var isLoadingState = MutableStateFlow(true)
 
     suspend fun fetchAllPhoto(page: Int): List<GalleryItem> {
-        return fetchMetadata { flickrApi.fetchPhotos(page) }
+        return fetchMetadata { flickrApi.fetchAllPhoto(page) }
     }
 
     suspend fun fetchFindPhoto(text: String, page: Int): List<GalleryItem> {
-        return fetchMetadata { flickrApi.searchPhotos(text, page) }
+        return fetchMetadata { flickrApi.fetchFindPhoto(text, page) }
     }
 
     private suspend fun fetchMetadata(request: () -> Call<FlickrResponse>): List<GalleryItem> {
