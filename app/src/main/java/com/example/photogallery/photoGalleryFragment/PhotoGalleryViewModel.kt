@@ -17,13 +17,12 @@ import com.example.photogallery.data.FlickrPagingSource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * @property _currentPhotos для сохранения прогресса RecyclerView
+ * @property _currentPhotosSearch для сохранения прогресса RecyclerView
  * @property progress для сохранения прогресса RecyclerView
  * @property _storedQuery для сохранения запроса при перезапуске приложения
  */
@@ -34,6 +33,7 @@ class PhotoGalleryViewModel @Inject constructor(
 ): AndroidViewModel(app) {
 
     private var _currentPhotos: Flow<PagingData<GalleryItem>>? = null
+    private var _currentPhotosSearch: Flow<PagingData<GalleryItem>>? = null
     private var progress = MutableLiveData(0)
 
     private var _storedQuery = MutableStateFlow<String?>(null)
@@ -48,10 +48,10 @@ class PhotoGalleryViewModel @Inject constructor(
             Log.d(TAG, "$MODULE_NAME stored query after initialize: ${_storedQuery.value}")
 
             if (_storedQuery.value.isNullOrBlank()) {
-                observe(loadPhotoFlow())
+                observePhoto()
             } else {
                 _storedQuery.value?.let { storedQuery ->
-                    observe(searchPhotosFlow(storedQuery))
+                    observeSearch(storedQuery)
                 }
             }
         }
@@ -59,11 +59,11 @@ class PhotoGalleryViewModel @Inject constructor(
 
     fun searchItems(text: String) {
         loadingData.value = PagingData.empty()
-        observe(searchPhotosFlow(text))
+        observeSearch(text)
     }
 
     fun loadingItems() {
-        observe(loadPhotoFlow())
+        observePhoto()
     }
 
     fun loadingState(state: (Boolean) -> Unit) {
@@ -83,17 +83,13 @@ class PhotoGalleryViewModel @Inject constructor(
 
     private fun loadPhotoFlow(): Flow<PagingData<GalleryItem>> {
 
-        if (_currentPhotos == null || progress.value == 0) {
-            _currentPhotos = fetchPagingData { page ->
-                progress.value = page
-                flickrFetcher.fetchPhotos(page)
-            }
-        }
-
         Log.i(TAG, "🟢$MODULE_NAME load photo checked (progress = ${progress.value})")
 
         return _currentPhotos
-            ?: fetchPagingData {  page ->
+            ?: fetchPagingData { page ->
+                progress.value = page
+                Log.d(TAG, "current page: $page")
+
                 flickrFetcher.fetchPhotos(page)
             }
     }
@@ -104,17 +100,32 @@ class PhotoGalleryViewModel @Inject constructor(
 
         Log.i(TAG, "$MODULE_NAME search photo checked (progress: ${progress.value} page)")
 
-        return _currentPhotos ?: fetchPagingData { page ->
-            progress.value = page
-            Log.d(TAG, "current page: $page")
+        return _currentPhotosSearch
+            ?: fetchPagingData { page ->
+                progress.value = page
+                Log.d(TAG, "current page: $page")
 
-            flickrFetcher.searchPhotos(text, page)
+                flickrFetcher.searchPhotos(text, page)
+            }
+    }
+
+    private fun observePhoto() {
+
+        _currentPhotos = loadPhotoFlow()
+
+        viewModelScope.launch {
+            loadPhotoFlow().collect {
+                loadingData.value = it
+            }
         }
     }
 
-    private fun observe(method: Flow<PagingData<GalleryItem>>) {
+    private fun observeSearch(text: String) {
+
+        _currentPhotosSearch = searchPhotosFlow(text)
+
         viewModelScope.launch {
-            method.collect {
+            searchPhotosFlow(text).collect {
                 loadingData.value = it
             }
         }
