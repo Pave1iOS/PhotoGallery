@@ -69,16 +69,9 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
 
-        viewModel.loadingData.observe(viewLifecycleOwner) { data ->
-            lifecycleScope.launch {
-                Log.d(TAG, "$MODULE_NAME data: $data")
-                adapter.submitData(data)
-            }
-        }
+        viewModel.initializeData(viewLifecycleOwner)
 
-
-
-//        loadPhotos()
+        loadPhotos()
     }
 
     override fun onStart() {
@@ -106,6 +99,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         return when(menuItem.itemId) {
             R.id.menu_item_clear -> {
                 viewModel.clearStoredQuery()
+                loadPhotos()
                 true
             }
             else -> super.onContextItemSelected(menuItem)
@@ -209,29 +203,16 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     }
 
     private fun loadPhotos() {
-
-        viewModel.queryCheck { lastQuery ->
-
-            Log.i(TAG, "$MODULE_NAME last query = $lastQuery")
-
-            if (lastQuery.isBlank()) {
-                observe(viewModel.loadPhotos())
-            } else {
-                searchPhotos(lastQuery)
+        viewModel.loadingData.observe(viewLifecycleOwner) { data ->
+            lifecycleScope.launch {
+                Log.d(TAG, "$MODULE_NAME data: $data")
+                adapter.submitData(data)
             }
         }
     }
 
     private fun searchPhotos(text: String) {
-        observe(viewModel.searchPhotos(text))
-    }
-
-    private fun observe(method: LiveData<PagingData<GalleryItem>>) {
-        method.observe(viewLifecycleOwner) {
-            lifecycleScope.launch {
-                adapter.submitData(it)
-            }
-        }
+        viewModel.searchByPhoto(text, viewLifecycleOwner)
     }
 
     private fun loadingState() {
