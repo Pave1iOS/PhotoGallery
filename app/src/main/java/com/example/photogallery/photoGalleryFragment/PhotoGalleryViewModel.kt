@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * @property _currentPhotosSearch для сохранения прогресса RecyclerView
+ * @property _savedFindPhotos для сохранения прогресса RecyclerView
  * @property progress для сохранения прогресса RecyclerView
  * @property _storedQuery для сохранения запроса при перезапуске приложения
  */
@@ -32,13 +32,13 @@ class PhotoGalleryViewModel @Inject constructor(
     private val app: Application
 ): AndroidViewModel(app) {
 
-    private var _currentPhotos: Flow<PagingData<GalleryItem>>? = null
-    private var _currentPhotosSearch: Flow<PagingData<GalleryItem>>? = null
+    var photos = MutableLiveData<PagingData<GalleryItem>>()
+
+    private var _savedLoadPhotos: Flow<PagingData<GalleryItem>>? = null
+    private var _savedFindPhotos: Flow<PagingData<GalleryItem>>? = null
+
     private var progress = MutableLiveData(0)
-
     private var _storedQuery = MutableStateFlow<String?>(null)
-
-    var loadingData = MutableLiveData<PagingData<GalleryItem>>()
 
     fun initializeData() {
 
@@ -48,22 +48,22 @@ class PhotoGalleryViewModel @Inject constructor(
             Log.d(TAG, "$MODULE_NAME stored query after initialize: ${_storedQuery.value}")
 
             if (_storedQuery.value.isNullOrBlank()) {
-                observePhoto()
+                observeLoad()
             } else {
                 _storedQuery.value?.let { storedQuery ->
-                    observeSearch(storedQuery)
+                    observeFind(storedQuery)
                 }
             }
         }
     }
 
-    fun searchItems(text: String) {
-        loadingData.value = PagingData.empty()
-        observeSearch(text)
+    fun getPhotoByQuery(query: String) {
+        photos.value = PagingData.empty()
+        observeFind(query)
     }
 
-    fun loadingItems() {
-        observePhoto()
+    fun getAllPhoto() {
+        observeLoad()
     }
 
     fun loadingState(state: (Boolean) -> Unit) {
@@ -81,11 +81,11 @@ class PhotoGalleryViewModel @Inject constructor(
         Log.d(TAG, "clear stored query")
     }
 
-    private fun loadPhotoFlow(): Flow<PagingData<GalleryItem>> {
+    private fun loadPhotosFlow(): Flow<PagingData<GalleryItem>> {
 
         Log.i(TAG, "🟢$MODULE_NAME load photo checked (progress = ${progress.value})")
 
-        return _currentPhotos
+        return _savedLoadPhotos
             ?: fetchPagingData { page ->
                 progress.value = page
                 Log.d(TAG, "current page: $page")
@@ -94,13 +94,13 @@ class PhotoGalleryViewModel @Inject constructor(
             }
     }
 
-    private fun searchPhotosFlow(text: String): Flow<PagingData<GalleryItem>> {
+    private fun findPhotosFlow(text: String): Flow<PagingData<GalleryItem>> {
 
         saveStorageQuery(text)
 
         Log.i(TAG, "$MODULE_NAME search photo checked (progress: ${progress.value} page)")
 
-        return _currentPhotosSearch
+        return _savedFindPhotos
             ?: fetchPagingData { page ->
                 progress.value = page
                 Log.d(TAG, "current page: $page")
@@ -109,24 +109,24 @@ class PhotoGalleryViewModel @Inject constructor(
             }
     }
 
-    private fun observePhoto() {
+    private fun observeLoad() {
 
-        _currentPhotos = loadPhotoFlow()
+        _savedLoadPhotos = loadPhotosFlow()
 
         viewModelScope.launch {
-            loadPhotoFlow().collect {
-                loadingData.value = it
+            loadPhotosFlow().collect {
+                photos.value = it
             }
         }
     }
 
-    private fun observeSearch(text: String) {
+    private fun observeFind(text: String) {
 
-        _currentPhotosSearch = searchPhotosFlow(text)
+        _savedFindPhotos = findPhotosFlow(text)
 
         viewModelScope.launch {
-            searchPhotosFlow(text).collect {
-                loadingData.value = it
+            findPhotosFlow(text).collect {
+                photos.value = it
             }
         }
     }

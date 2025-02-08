@@ -103,7 +103,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 Log.i(TAG, "🟢$MODULE_NAME called query search: $query")
-                searchPhotos(query)
+                findPhotos(query)
 
                 return true
             }
@@ -117,7 +117,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
                     if (newText == LAST_QUERY_TEXT)
 
                         if (newText.isNotBlank()) {
-                            searchPhotos(newText)
+                            findPhotos(newText)
                         } else {
                             loadPhoto()
                         }
@@ -196,7 +196,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     }
 
     private fun loadDate() {
-        viewModel.loadingData.observe(viewLifecycleOwner) { data ->
+        viewModel.photos.observe(viewLifecycleOwner) { data ->
             lifecycleScope.launch {
                 adapter.submitData(data)
             }
@@ -204,11 +204,11 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     }
 
     private fun loadPhoto() {
-        viewModel.loadingItems()
+        viewModel.getAllPhoto()
     }
 
-    private fun searchPhotos(text: String) {
-        viewModel.searchItems(text)
+    private fun findPhotos(text: String) {
+        viewModel.getPhotoByQuery(text)
     }
 
     private fun loadingState() {
