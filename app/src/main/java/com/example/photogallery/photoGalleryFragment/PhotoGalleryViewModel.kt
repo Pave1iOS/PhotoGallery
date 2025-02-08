@@ -3,30 +3,20 @@ package com.example.photogallery.photoGalleryFragment
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSourceFactory
 import androidx.paging.cachedIn
-import androidx.paging.liveData
 import com.example.photogallery.api.GalleryItem
 import com.example.photogallery.data.FlickrDataStore
 import com.example.photogallery.data.FlickrFetcher
 import com.example.photogallery.data.FlickrPagingSource
-import com.example.photogallery.photoGalleryFragment.PhotoGalleryFragment.Companion
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -82,14 +72,6 @@ class PhotoGalleryViewModel @Inject constructor(
         _storedQuery.value = ""
     }
 
-    private fun observe(method: Flow<PagingData<GalleryItem>>) {
-        viewModelScope.launch {
-            method.collect {
-                loadingData.value = it
-            }
-        }
-    }
-
     private fun loadPhotos(): Flow<PagingData<GalleryItem>> {
 
         if (_currentPhotos == null || progress.value == 0) {
@@ -120,6 +102,14 @@ class PhotoGalleryViewModel @Inject constructor(
 
         return fetchPagingData {
             flickrFetcher.searchPhotos(text)
+        }
+    }
+
+    private fun observe(method: Flow<PagingData<GalleryItem>>) {
+        viewModelScope.launch {
+            method.collect {
+                loadingData.value = it
+            }
         }
     }
 
