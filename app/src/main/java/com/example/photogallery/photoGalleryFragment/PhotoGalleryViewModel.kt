@@ -17,6 +17,7 @@ import com.example.photogallery.data.FlickrPagingSource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class PhotoGalleryViewModel @Inject constructor(
     var loadingData = MutableLiveData<PagingData<GalleryItem>>()
 
     fun initializeData() {
+
         viewModelScope.launch {
 
             loadStoredQuery().join()
@@ -75,7 +77,7 @@ class PhotoGalleryViewModel @Inject constructor(
     fun clearStoredQuery() {
         saveStorageQuery("")
 
-        Log.d(TAG, "clear stored query: ${_storedQuery.value}")
+        Log.d(TAG, "clear stored query")
     }
 
     private fun loadPhotoFlow(): Flow<PagingData<GalleryItem>> {
@@ -100,13 +102,14 @@ class PhotoGalleryViewModel @Inject constructor(
 
         saveStorageQuery(text)
 
-        progress.value = 0
 
-        Log.i(TAG, "$MODULE_NAME search photo progress = ${progress.value}")
+
         Log.d(TAG, "search photo checked")
+        Log.i(TAG, "$MODULE_NAME search photo progress = ${progress.value}")
 
-        return fetchPagingData {
-            flickrFetcher.searchPhotos(text)
+        return fetchPagingData { page ->
+            progress.value = page
+            flickrFetcher.searchPhotos(text, page)
         }
     }
 
@@ -139,7 +142,7 @@ class PhotoGalleryViewModel @Inject constructor(
                 .collect { query ->
                 _storedQuery.value = query
 
-                Log.i(TAG, "$MODULE_NAME load stored query: $query")
+//                Log.i(TAG, "$MODULE_NAME load stored query: $query")
             }
         }
     }

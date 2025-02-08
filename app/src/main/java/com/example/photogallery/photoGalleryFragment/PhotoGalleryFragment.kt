@@ -36,10 +36,6 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     private lateinit var adapter: PhotoGalleryAdapter
     private lateinit var binding: FragmentPhotoGalleryBinding
 
-    init {
-        Log.d(TAG, "$MODULE_NAME initialize")
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -202,7 +198,6 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     private fun loadDate() {
         viewModel.loadingData.observe(viewLifecycleOwner) { data ->
             lifecycleScope.launch {
-                Log.d(TAG, "$MODULE_NAME data: $data")
                 adapter.submitData(data)
             }
         }

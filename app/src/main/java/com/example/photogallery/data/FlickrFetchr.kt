@@ -24,8 +24,8 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
         return fetchPhotoMetadata { flickrApi.fetchPhotos(page) }
     }
 
-    suspend fun searchPhotos(text: String): List<GalleryItem> {
-        return fetchPhotoMetadata { flickrApi.searchPhotos(text) }
+    suspend fun searchPhotos(text: String, page: Int): List<GalleryItem> {
+        return fetchPhotoMetadata { flickrApi.searchPhotos(text, page) }
     }
 
     private suspend fun fetchPhotoMetadata(request: () -> Call<FlickrResponse>): List<GalleryItem> {
