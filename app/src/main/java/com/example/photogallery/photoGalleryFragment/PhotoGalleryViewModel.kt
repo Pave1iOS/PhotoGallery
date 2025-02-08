@@ -22,7 +22,9 @@ import com.example.photogallery.photoGalleryFragment.PhotoGalleryFragment.Compan
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.take
@@ -40,32 +42,32 @@ class PhotoGalleryViewModel @Inject constructor(
     private val app: Application
 ): AndroidViewModel(app) {
 
-    private var _currentPhotos: LiveData<PagingData<GalleryItem>>? = null
+    private var _currentPhotos: Flow<PagingData<GalleryItem>>? = null
     private var progress = MutableLiveData(0)
 
     private var _storedQuery = MutableStateFlow<String?>(null)
 
     var loadingData = MutableLiveData<PagingData<GalleryItem>>()
 
-    fun initializeData(owner: LifecycleOwner) {
+    fun initializeData() {
         viewModelScope.launch {
 
             loadStoredQuery().join()
             Log.d(TAG, "$MODULE_NAME stored query after initialize: ${_storedQuery.value}")
 
             if (_storedQuery.value.isNullOrBlank()) {
-                observe(loadPhotos(), owner)
+                observe(loadPhotos())
             } else {
                 _storedQuery.value?.let { storedQuery ->
-                    observe(searchPhotos(storedQuery), owner)
+                    observe(searchPhotos(storedQuery))
                 }
             }
         }
     }
 
-    fun searchByPhoto(text: String, owner: LifecycleOwner) {
+    fun searchByPhoto(text: String) {
         loadingData.value = PagingData.empty()
-        observe(searchPhotos(text), owner)
+        observe(searchPhotos(text))
     }
 
     fun loadingState(state: (Boolean) -> Unit) {
@@ -80,13 +82,15 @@ class PhotoGalleryViewModel @Inject constructor(
         _storedQuery.value = ""
     }
 
-    private fun observe(method: LiveData<PagingData<GalleryItem>>, owner: LifecycleOwner) {
-        method.observe(owner) {
-            loadingData.value = it
+    private fun observe(method: Flow<PagingData<GalleryItem>>) {
+        viewModelScope.launch {
+            method.collect {
+                loadingData.value = it
+            }
         }
     }
 
-    private fun loadPhotos(): LiveData<PagingData<GalleryItem>> {
+    private fun loadPhotos(): Flow<PagingData<GalleryItem>> {
 
         if (_currentPhotos == null || progress.value == 0) {
             _currentPhotos = fetchPagingData { page ->
@@ -103,7 +107,7 @@ class PhotoGalleryViewModel @Inject constructor(
             }
     }
 
-    private fun searchPhotos(text: String): LiveData<PagingData<GalleryItem>> {
+    private fun searchPhotos(text: String): Flow<PagingData<GalleryItem>> {
 
         viewModelScope.launch {
             FlickrDataStore.setStoredQuery(app, text)
@@ -141,7 +145,7 @@ class PhotoGalleryViewModel @Inject constructor(
 
     private fun fetchPagingData(
         handler: suspend (Int) -> List<GalleryItem>
-    ): LiveData<PagingData<GalleryItem>> {
+    ): Flow<PagingData<GalleryItem>> {
 
         val config = PagingConfig(PAGE_SIZE)
 
@@ -152,7 +156,7 @@ class PhotoGalleryViewModel @Inject constructor(
         }
 
         return Pager(config, pagingSourceFactory = factory)
-            .liveData
+            .flow
             .cachedIn(viewModelScope)
     }
 

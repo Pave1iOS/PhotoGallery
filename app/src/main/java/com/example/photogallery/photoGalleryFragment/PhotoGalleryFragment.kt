@@ -69,7 +69,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
 
-        viewModel.initializeData(viewLifecycleOwner)
+        viewModel.initializeData()
 
         loadPhotos()
     }
@@ -212,7 +212,7 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
     }
 
     private fun searchPhotos(text: String) {
-        viewModel.searchByPhoto(text, viewLifecycleOwner)
+        viewModel.searchByPhoto(text)
     }
 
     private fun loadingState() {
