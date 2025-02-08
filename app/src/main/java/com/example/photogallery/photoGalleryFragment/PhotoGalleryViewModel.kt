@@ -74,6 +74,12 @@ class PhotoGalleryViewModel @Inject constructor(
 
     fun clearStoredQuery() {
         _storedQuery.value = ""
+
+        viewModelScope.launch {
+            FlickrDataStore.setStoredQuery(app, "")
+        }
+
+        Log.d(TAG, "clear stored query: ${_storedQuery.value}")
     }
 
     private fun loadPhotoFlow(): Flow<PagingData<GalleryItem>> {
