@@ -20,15 +20,15 @@ class FlickrFetcher @Inject constructor(private val flickrApi: FlickrApi) {
     var isNetworkState = MutableStateFlow(true)
     var isLoadingState = MutableStateFlow(true)
 
-    suspend fun fetchPhotos(page: Int): List<GalleryItem> {
-        return fetchPhotoMetadata { flickrApi.fetchPhotos(page) }
+    suspend fun fetchAllPhoto(page: Int): List<GalleryItem> {
+        return fetchMetadata { flickrApi.fetchPhotos(page) }
     }
 
-    suspend fun searchPhotos(text: String, page: Int): List<GalleryItem> {
-        return fetchPhotoMetadata { flickrApi.searchPhotos(text, page) }
+    suspend fun fetchFindPhoto(text: String, page: Int): List<GalleryItem> {
+        return fetchMetadata { flickrApi.searchPhotos(text, page) }
     }
 
-    private suspend fun fetchPhotoMetadata(request: () -> Call<FlickrResponse>): List<GalleryItem> {
+    private suspend fun fetchMetadata(request: () -> Call<FlickrResponse>): List<GalleryItem> {
         return withContext(Dispatchers.IO) {
 
             isNetworkState.value = true

@@ -87,7 +87,7 @@ class PhotoGalleryViewModel @Inject constructor(
             ?: fetchPagingData { page ->
                 Log.d(TAG, "current page: $page")
 
-                flickrFetcher.fetchPhotos(page)
+                flickrFetcher.fetchAllPhoto(page)
             }
     }
 
@@ -101,7 +101,7 @@ class PhotoGalleryViewModel @Inject constructor(
             ?: fetchPagingData { page ->
                 Log.d(TAG, "current page: $page")
 
-                flickrFetcher.searchPhotos(text, page)
+                flickrFetcher.fetchFindPhoto(text, page)
             }
     }
 
