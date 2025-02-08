@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * @property _savedFindPhotos для сохранения прогресса RecyclerView
+ * @property _savedFindPhoto для сохранения прогресса RecyclerView
  * @property progress для сохранения прогресса RecyclerView
  * @property _storedQuery для сохранения запроса при перезапуске приложения
  */
@@ -34,8 +34,8 @@ class PhotoGalleryViewModel @Inject constructor(
 
     var photos = MutableLiveData<PagingData<GalleryItem>>()
 
-    private var _savedLoadPhotos: Flow<PagingData<GalleryItem>>? = null
-    private var _savedFindPhotos: Flow<PagingData<GalleryItem>>? = null
+    private var _savedLoadPhoto: Flow<PagingData<GalleryItem>>? = null
+    private var _savedFindPhoto: Flow<PagingData<GalleryItem>>? = null
 
     private var _storedQuery = MutableStateFlow<String?>(null)
 
@@ -79,11 +79,11 @@ class PhotoGalleryViewModel @Inject constructor(
         Log.d(TAG, "clear stored query")
     }
 
-    private fun loadPhotosFlow(): Flow<PagingData<GalleryItem>> {
+    private fun loadPhotoFlow(): Flow<PagingData<GalleryItem>> {
 
         Log.i(TAG, "🟢$MODULE_NAME load photo init")
 
-        return _savedLoadPhotos
+        return _savedLoadPhoto
             ?: fetchPagingData { page ->
                 Log.d(TAG, "current page: $page")
 
@@ -91,13 +91,13 @@ class PhotoGalleryViewModel @Inject constructor(
             }
     }
 
-    private fun findPhotosFlow(text: String): Flow<PagingData<GalleryItem>> {
+    private fun findPhotoFlow(text: String): Flow<PagingData<GalleryItem>> {
 
         saveStorageQuery(text)
 
         Log.i(TAG, "$MODULE_NAME search photo init")
 
-        return _savedFindPhotos
+        return _savedFindPhoto
             ?: fetchPagingData { page ->
                 Log.d(TAG, "current page: $page")
 
@@ -107,10 +107,10 @@ class PhotoGalleryViewModel @Inject constructor(
 
     private fun observeLoad() {
 
-        _savedLoadPhotos = loadPhotosFlow()
+        _savedLoadPhoto = loadPhotoFlow()
 
         viewModelScope.launch {
-            loadPhotosFlow().collect {
+            loadPhotoFlow().collect {
                 photos.value = it
             }
         }
@@ -118,10 +118,10 @@ class PhotoGalleryViewModel @Inject constructor(
 
     private fun observeFind(text: String) {
 
-        _savedFindPhotos = findPhotosFlow(text)
+        _savedFindPhoto = findPhotoFlow(text)
 
         viewModelScope.launch {
-            findPhotosFlow(text).collect {
+            findPhotoFlow(text).collect {
                 photos.value = it
             }
         }
