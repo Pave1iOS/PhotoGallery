@@ -76,6 +76,7 @@ class PhotoGalleryViewModel @Inject constructor(
 
     fun clearStoredQuery() {
         saveStorageQuery("")
+        progress.value = 0
 
         Log.d(TAG, "clear stored query")
     }
@@ -89,8 +90,7 @@ class PhotoGalleryViewModel @Inject constructor(
             }
         }
 
-        Log.d(TAG, "load photo checked")
-        Log.i(TAG, "🟢$MODULE_NAME load photo progress = ${progress.value}")
+        Log.i(TAG, "🟢$MODULE_NAME load photo checked (progress = ${progress.value})")
 
         return _currentPhotos
             ?: fetchPagingData {  page ->
@@ -102,13 +102,12 @@ class PhotoGalleryViewModel @Inject constructor(
 
         saveStorageQuery(text)
 
+        Log.i(TAG, "$MODULE_NAME search photo checked (progress: ${progress.value} page)")
 
-
-        Log.d(TAG, "search photo checked")
-        Log.i(TAG, "$MODULE_NAME search photo progress = ${progress.value}")
-
-        return fetchPagingData { page ->
+        return _currentPhotos ?: fetchPagingData { page ->
             progress.value = page
+            Log.d(TAG, "current page: $page")
+
             flickrFetcher.searchPhotos(text, page)
         }
     }
