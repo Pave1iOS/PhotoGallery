@@ -79,6 +79,10 @@ class PhotoGalleryViewModel @Inject constructor(
         Log.d(TAG, "clear stored query")
     }
 
+    fun clearedSavedFindPhoto() {
+        _savedFindPhoto = null
+    }
+
     private fun loadPhotoFlow(): Flow<PagingData<GalleryItem>> {
 
         Log.i(TAG, "🟢$MODULE_NAME load photo init")

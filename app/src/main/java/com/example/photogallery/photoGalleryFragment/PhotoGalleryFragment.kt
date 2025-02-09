@@ -110,7 +110,9 @@ class PhotoGalleryFragment: Fragment(), MenuProvider {
 
             override fun onQueryTextChange(newText: String): Boolean {
                 Log.i(TAG, "🟢$MODULE_NAME called character search: $newText")
-                // задержка перед поиском и посиск по последнему набранному
+
+                viewModel.clearedSavedFindPhoto()
+
                 lifecycleScope.launch {
                     delay(2000)
 
